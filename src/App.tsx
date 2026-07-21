@@ -204,14 +204,62 @@ const TRIP_DATA = {
     { he: 'כמה זה עולה?', ja: 'Ikura desu ka?', kana: 'いくらですか' },
     { he: 'טעים מאוד', ja: 'Oishii desu', kana: '美味しいです' }
   ],
+  // NOTE: each category now carries its own `places` array (name + neighborhood + note).
+  // These are placeholders — swap in your real saved spots. The `count` badge on the
+  // grid card now reflects places.length automatically instead of a hardcoded number.
   categories: [
-    { title: 'בתי קפה', color: 'bg-green-100', icon: '🍵', count: 29 },
-    { title: 'מסעדות', color: 'bg-pink-100', icon: '🍜', count: 62 },
-    { title: 'שופינג', color: 'bg-blue-100', icon: '🛍️', count: 19 },
-    { title: 'מאפיות ומתוקים', color: 'bg-orange-100', icon: '🥐', count: 12 },
-    { title: 'אונסן ורוגע', color: 'bg-green-50', icon: '♨️', count: 2 },
-    { title: 'מקדשים ואתרים', color: 'bg-purple-100', icon: '⛩️', count: 32 },
-    { title: 'תרבות ואומנות', color: 'bg-yellow-100', icon: '🎨', count: 15 }
+    { 
+      title: 'בתי קפה', color: 'bg-green-100', icon: '🍵',
+      places: [
+        { name: '% Arabica', area: 'Kyoto Arashiyama', note: 'קפה עם נוף לנהר' },
+        { name: 'Blue Bottle Coffee', area: 'Shibuya', note: 'רוסטרי שקט ומעוצב' },
+        { name: 'Café Kitsuné', area: 'Aoyama', note: 'עיצוב מינימליסטי, מאצ\'ה לאטה' },
+      ]
+    },
+    { 
+      title: 'מסעדות', color: 'bg-pink-100', icon: '🍜',
+      places: [
+        { name: 'Gonpachi Nishi-Azabu', area: 'Tokyo', note: 'המסעדה מ"קיל ביל"' },
+        { name: 'Ichiran Ramen', area: 'כל עיר', note: 'רשת רמן פופולרית עם תא אישי' },
+        { name: 'Kuromon Ichiba', area: 'Osaka', note: 'שוק אוכל, טעימות רבות' },
+      ]
+    },
+    { 
+      title: 'שופינג', color: 'bg-blue-100', icon: '🛍️',
+      places: [
+        { name: 'GINZA SIX', area: 'Ginza', note: 'קניון יוקרה מרכזי' },
+        { name: 'Don Quijote', area: 'Shibuya', note: 'הכל אפשר למצוא, פתוח 24/7' },
+        { name: 'Takeshita Street', area: 'Harajuku', note: 'אופנה צעירה וממתקים' },
+      ]
+    },
+    { 
+      title: 'מאפיות ומתוקים', color: 'bg-orange-100', icon: '🥐',
+      places: [
+        { name: 'Nakatanidou Mochi', area: 'Nara', note: 'מופע הכנת מוצ\'י' },
+        { name: 'Wagashi Nakamise', area: 'Asakusa', note: 'ממתקים יפניים מסורתיים' },
+      ]
+    },
+    { 
+      title: 'אונסן ורוגע', color: 'bg-green-50', icon: '♨️',
+      places: [
+        { name: 'Hakone Ashinoko Hanaori', area: 'Hakone', note: 'אונסן פרטי עם נוף לאגם' },
+      ]
+    },
+    { 
+      title: 'מקדשים ואתרים', color: 'bg-purple-100', icon: '⛩️',
+      places: [
+        { name: 'Kinkaku-ji', area: 'Kyoto', note: 'מקדש הזהב' },
+        { name: 'Fushimi Inari', area: 'Kyoto', note: 'מנהרת שערי הטורי' },
+        { name: 'Senso-ji', area: 'Asakusa', note: 'המקדש העתיק ביותר בטוקיו' },
+      ]
+    },
+    { 
+      title: 'תרבות ואומנות', color: 'bg-yellow-100', icon: '🎨',
+      places: [
+        { name: 'teamLab Planets', area: 'Toyosu', note: 'חוויית אור ומגע' },
+        { name: 'Mori Art Museum', area: 'Roppongi', note: 'תצפית ואמנות עכשווית' },
+      ]
+    }
   ]
 };
 
@@ -362,6 +410,47 @@ function MapTab() {
 }
 
 function PlacesTab() {
+  // NEW: tracks which category card was tapped. null = show the grid.
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  // NEW: detail view for a single category's places
+  if (selectedCategory) {
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-500"
+          >
+            <ChevronRight size={20} />
+          </button>
+          <div>
+            <h2 className="text-2xl font-light text-gray-800 flex items-center gap-2">
+              <span>{selectedCategory.icon}</span> {selectedCategory.title}
+            </h2>
+            <p className="text-gray-500 text-sm">{selectedCategory.places.length} מקומות</p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {selectedCategory.places.map((place, i) => (
+            <div key={i} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex items-center justify-between">
+              <button className="text-xs text-blue-500 font-medium flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-lg shrink-0">
+                <MapPin size={12}/> נווט
+              </button>
+              <div className="text-right flex-1 pr-4">
+                <h4 className="font-bold text-gray-800">{place.name}</h4>
+                <p className="text-gray-500 text-sm">{place.area}</p>
+                {place.note && <p className="text-gray-400 text-xs mt-1">{place.note}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Grid view (default)
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3 mb-6">
@@ -374,11 +463,15 @@ function PlacesTab() {
 
       <div className="grid grid-cols-2 gap-4">
         {TRIP_DATA.categories.map((cat, i) => (
-          <div key={i} className={`${cat.color} rounded-3xl p-5 flex flex-col items-center justify-center text-center shadow-sm h-40 relative overflow-hidden`}>
+          <button
+            key={i}
+            onClick={() => setSelectedCategory(cat)}
+            className={`${cat.color} rounded-3xl p-5 flex flex-col items-center justify-center text-center shadow-sm h-40 relative overflow-hidden active:scale-95 transition-transform`}
+          >
             <div className="text-5xl mb-3 drop-shadow-sm">{cat.icon}</div>
             <h4 className="font-medium text-gray-800">{cat.title}</h4>
-            <p className="text-gray-500 text-xs">{cat.count} מקומות</p>
-          </div>
+            <p className="text-gray-500 text-xs">{cat.places.length} מקומות</p>
+          </button>
         ))}
       </div>
     </div>
