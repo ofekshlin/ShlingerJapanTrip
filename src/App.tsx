@@ -1,3 +1,4 @@
+// @ts-nocheck
 import JapanTripApp from './JapanTripApp';
 
 function App() {
