@@ -57,8 +57,19 @@ const TRIP_DATA = {
 
 // --- MAIN APP COMPONENT ---
 export default function JapanTripApp() {
+  const getInitialDayIndex = () => {
+    const today = new Date();
+    let idx = 0;
+    ITINERARY.forEach((d, i) => {
+      const [dd, mm] = d.date.split('.').map(Number);
+      const dDate = new Date(2026, mm - 1, dd);
+      if (today >= dDate) idx = i;
+    });
+    return idx;
+  };
+
   const [activeTab, setActiveTab] = useState('home');
-  const [selectedDay, setSelectedDay] = useState(0);
+  const [selectedDay, setSelectedDay] = useState(getInitialDayIndex());
 
   const speakJapanese = (text = '') => {
     if ('speechSynthesis' in window) {
@@ -82,7 +93,7 @@ export default function JapanTripApp() {
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto pb-24 px-4 custom-scrollbar">
-        {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} setSelectedDay={setSelectedDay} />}
+        {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} setSelectedDay={setSelectedDay} selectedDay={selectedDay} />}
         {activeTab === 'map' && <MapTab />}
         {activeTab === 'places' && <PlacesTab />}
         {activeTab === 'itinerary' && <ItineraryTab selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
@@ -103,7 +114,7 @@ export default function JapanTripApp() {
 
 // --- TAB COMPONENTS ---
 
-function HomeTab({ setActiveTab, setSelectedDay }) {
+function HomeTab({ setActiveTab, setSelectedDay, selectedDay }) {
   const [daysLeft, setDaysLeft] = useState(0);
 
   useEffect(() => {
@@ -126,29 +137,52 @@ function HomeTab({ setActiveTab, setSelectedDay }) {
     setActiveTab('itinerary');
   };
 
+  const dayData = ITINERARY[selectedDay];
+
+  const cityEmojis = {
+    'טוקיו': '🗼',
+    'האקונה': '♨️',
+    'קיוטו': '⛩️',
+    'אוסקה': '🏯',
+    'קמקורה': '🌊'
+  };
+  
+  const currentCityEmoji = cityEmojis[dayData.city] || '🗾';
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-[#FAF3E0] rounded-3xl p-8 text-center shadow-sm mb-8">
         <h2 className="text-3xl font-bold mb-4 text-[#5D554D]">יפן מחכה לנו!</h2>
 
-        {/* Mock Avatar Illustration */}
-        <div className="flex justify-center items-end gap-2 mb-6 h-32">
-          <div className="w-24 h-32 bg-[#EADDC2] rounded-full overflow-hidden relative">
-            <div className="absolute bottom-0 w-full h-24 bg-[#5D554D] rounded-t-full opacity-20"></div>
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 text-5xl">👨🏻</div>
-          </div>
-          <div className="w-24 h-28 bg-[#EADDC2] rounded-full overflow-hidden relative">
-            <div className="absolute bottom-0 w-full h-20 bg-[#5D554D] rounded-t-full opacity-20"></div>
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 text-5xl">👱🏻‍♂️</div>
-          </div>
+        {/* Japan Illustration */}
+        <div className="flex justify-center items-center gap-4 mb-6 h-32">
+          <div className="text-7xl animate-bounce" style={{ animationDuration: '3s' }}>🗻</div>
+          <div className="text-6xl">🌸</div>
+          <div className="text-7xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>⛩️</div>
         </div>
 
-        <p className="text-gray-500 text-sm mb-1">
-          ההמראה מתל אביב • {TRIP_DATA.startDate.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric' })} בערב
-        </p>
-        <div className="text-7xl font-light text-[#4A423A] mb-6">
-          {daysLeft > 0 ? daysLeft : 0} <span className="text-3xl">ימים</span>
-        </div>
+        {daysLeft > 0 ? (
+          <>
+            <p className="text-gray-500 text-sm mb-1">
+              ההמראה מתל אביב • {TRIP_DATA.startDate.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric' })} בערב
+            </p>
+            <div className="text-7xl font-light text-[#4A423A] mb-6">
+              {daysLeft} <span className="text-3xl">ימים</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-gray-500 text-sm mb-1">
+              אנחנו ביפן! 🇯🇵
+            </p>
+            <div className="text-5xl font-light text-[#4A423A] mb-2">
+              יום {selectedDay + 1} <span className="text-2xl">לטיול</span>
+            </div>
+            <div className="text-2xl font-medium text-[#D34A3E] mb-6 flex items-center justify-center gap-2">
+              {currentCityEmoji} עכשיו ב{dayData.city}
+            </div>
+          </>
+        )}
 
         {/* Mini route dots */}
         <div className="flex justify-center items-center gap-2 text-xs text-gray-500">
@@ -173,11 +207,45 @@ function HomeTab({ setActiveTab, setSelectedDay }) {
         <Calendar size={18} /> למסלול המלא של 18 הימים
       </button>
 
-      <h3 className="text-xl font-medium text-gray-700 mb-4 px-2">בקרוב נפתח להזמנה</h3>
-      <div className="space-y-3">
-        <UpcomingCard title="teamLab Planets" date="יום 2 • 27.7" note="להזמין מראש" />
-        <UpcomingCard title="מופע Sumo (אוסקה)" date="יום 12 • 6.8" note="הגרלה לקרב" />
-        <UpcomingCard title="טקס תה בקימונו (Gion)" date="יום 8 • 2.8" note="דרך יפן טורס" />
+      <h3 className="text-xl font-medium text-gray-700 mb-4 px-2">היום: {dayData.city} (יום {dayData.day})</h3>
+      <div className="relative border-r-2 border-dashed border-gray-300 pr-6 mr-2 pb-10">
+        {dayData.events.map((ev, i) => {
+          const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.title + ' Japan')}`;
+          return (
+            <div key={i} className="mb-6 relative animate-in slide-in-from-right-4 duration-300" style={{ animationDelay: `${i * 80}ms` }}>
+              {/* Timeline Dot */}
+              <div className={`absolute -right-[31px] top-4 w-4 h-4 rounded-full ${dayData.color} border-4 border-[#FDF8EE]`}></div>
+
+              <div className="flex gap-4">
+                <div className="w-14 pt-3 text-left shrink-0">
+                  {ev.time && <div className="text-gray-800 font-bold text-sm">{ev.time}</div>}
+                    <span className="text-gray-500 text-xs font-medium">{ev.transport}</span>
+                </div>
+
+                <div className="flex-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-50 relative">
+                  <div className={`absolute top-0 right-0 w-1 h-full ${dayData.color} rounded-r-2xl`}></div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-gray-400">{ICONS[ev.icon] || <MapPin size={16} />}</span>
+                    <h4 className="font-bold text-gray-800 text-base">{ev.title}</h4>
+                  </div>
+                  {ev.desc && <p className="text-sm text-gray-600 mb-2 leading-relaxed">{ev.desc}</p>}
+                    {ev.voucher && <p className="text-sm text-green-600 font-bold leading-relaxed">יש וואצ'ר</p>}
+
+                  <div className="mt-3 flex items-center gap-2">
+                    <a
+                      href={mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-500 font-medium flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-lg"
+                    >
+                      <MapPin size={12} /> נווט במפה
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -340,7 +408,7 @@ function ItineraryTab({ selectedDay, setSelectedDay }) {
         <div className="relative z-10">
           <h2 className="text-3xl font-light mb-1">{dayData.city}</h2>
           <p className="text-white/80 text-sm mb-3">יום {dayData.day} מתוך {ITINERARY.length} • {dayData.hotel}</p>
-          {dayData.intro && <p className="text-white/90 text-sm leading-snug bg-black/10 rounded-xl px-3 py-2">{dayData.intro}</p>}
+          {dayData.hotelAddress && <p className="text-white/90 text-sm leading-snug bg-black/10 rounded-xl px-3 py-2">{dayData.hotelAddress}</p>}
         </div>
       </div>
 
@@ -359,7 +427,8 @@ function ItineraryTab({ selectedDay, setSelectedDay }) {
 
               <div className="flex gap-4">
                 <div className="w-14 pt-3 text-left shrink-0">
-                  <span className="text-gray-500 text-sm font-medium">{ev.time}</span>
+                  {ev.time && <div className="text-gray-800 font-bold text-sm">{ev.time}</div>}
+                    <span className="text-gray-500 text-xs font-medium">{ev.transport}</span>
                 </div>
 
                 <div className="flex-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-50 relative">
@@ -368,7 +437,8 @@ function ItineraryTab({ selectedDay, setSelectedDay }) {
                     <span className="text-gray-400">{ICONS[ev.icon] || <MapPin size={16} />}</span>
                     <h4 className="font-bold text-gray-800 text-base">{ev.title}</h4>
                   </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{ev.desc}</p>
+                  {ev.desc && <p className="text-sm text-gray-600 mb-2 leading-relaxed">{ev.desc}</p>}
+                    {ev.voucher && <p className="text-sm text-green-600 font-bold leading-relaxed">יש וואצ'ר</p>}
 
                   <div className="mt-3 flex items-center gap-2">
                     <a
