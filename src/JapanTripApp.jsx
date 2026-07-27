@@ -68,7 +68,7 @@ export default function JapanTripApp() {
     return idx;
   };
 
-  const [activeTab, setActiveTab] = useState('itinerary');
+  const [activeTab, setActiveTab] = useState('home');
   const [selectedDay, setSelectedDay] = useState(getInitialDayIndex());
 
   const speakJapanese = (text = '') => {
@@ -139,29 +139,50 @@ function HomeTab({ setActiveTab, setSelectedDay, selectedDay }) {
 
   const dayData = ITINERARY[selectedDay];
 
+  const cityEmojis = {
+    'טוקיו': '🗼',
+    'האקונה': '♨️',
+    'קיוטו': '⛩️',
+    'אוסקה': '🏯',
+    'קמקורה': '🌊'
+  };
+  
+  const currentCityEmoji = cityEmojis[dayData.city] || '🗾';
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-[#FAF3E0] rounded-3xl p-8 text-center shadow-sm mb-8">
         <h2 className="text-3xl font-bold mb-4 text-[#5D554D]">יפן מחכה לנו!</h2>
 
-        {/* Mock Avatar Illustration */}
-        <div className="flex justify-center items-end gap-2 mb-6 h-32">
-          <div className="w-24 h-32 bg-[#EADDC2] rounded-full overflow-hidden relative">
-            <div className="absolute bottom-0 w-full h-24 bg-[#5D554D] rounded-t-full opacity-20"></div>
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 text-5xl">👨🏻</div>
-          </div>
-          <div className="w-24 h-28 bg-[#EADDC2] rounded-full overflow-hidden relative">
-            <div className="absolute bottom-0 w-full h-20 bg-[#5D554D] rounded-t-full opacity-20"></div>
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 text-5xl">👱🏻‍♂️</div>
-          </div>
+        {/* Japan Illustration */}
+        <div className="flex justify-center items-center gap-4 mb-6 h-32">
+          <div className="text-7xl animate-bounce" style={{ animationDuration: '3s' }}>🗻</div>
+          <div className="text-6xl">🌸</div>
+          <div className="text-7xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>⛩️</div>
         </div>
 
-        <p className="text-gray-500 text-sm mb-1">
-          ההמראה מתל אביב • {TRIP_DATA.startDate.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric' })} בערב
-        </p>
-        <div className="text-7xl font-light text-[#4A423A] mb-6">
-          {daysLeft > 0 ? daysLeft : 0} <span className="text-3xl">ימים</span>
-        </div>
+        {daysLeft > 0 ? (
+          <>
+            <p className="text-gray-500 text-sm mb-1">
+              ההמראה מתל אביב • {TRIP_DATA.startDate.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric' })} בערב
+            </p>
+            <div className="text-7xl font-light text-[#4A423A] mb-6">
+              {daysLeft} <span className="text-3xl">ימים</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-gray-500 text-sm mb-1">
+              אנחנו ביפן! 🇯🇵
+            </p>
+            <div className="text-5xl font-light text-[#4A423A] mb-2">
+              יום {selectedDay + 1} <span className="text-2xl">לטיול</span>
+            </div>
+            <div className="text-2xl font-medium text-[#D34A3E] mb-6 flex items-center justify-center gap-2">
+              {currentCityEmoji} עכשיו ב{dayData.city}
+            </div>
+          </>
+        )}
 
         {/* Mini route dots */}
         <div className="flex justify-center items-center gap-2 text-xs text-gray-500">
