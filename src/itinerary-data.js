@@ -1,30 +1,27 @@
-// Auto-generated rich itinerary from the official Japan Tours PDF (RONEN SHLINGER, 26 Jul – 12 Aug 2026)
+// Auto-generated from CSV
 export const ITINERARY = [
   {
     "day": 1,
     "date": "26.7",
     "city": "טוקיו",
     "hotel": "Richmond Hotel Asakusa",
+    "hotelAddress": "2 Chome-7-10 Asakusa, Taito City, Tokyo, Japan",
     "color": "bg-pink-400",
-    "intro": "נחיתה ביפן! מעבר למלון והיכרות ראשונה עם אווירת Asakusa המסורתית.",
     "events": [
       {
-        "time": "15:35",
-        "title": "נחיתה בשדה התעופה Narita",
-        "desc": "לאחר הנחיתה עלו על רכבת Skyliner ורדו בתחנת Ueno, ומשם מונית קצרה למלון. ניתן גם להזמין מיני-ואן פרטי דרך יפן טורס שיחכה לכם בשדה ויסיע ישירות למלון.",
-        "icon": "plane"
+        "title": "הגעה וצ׳ק אין למלון",
+        "transport": "הסעה",
+        "voucher": true
       },
       {
-        "time": "18:00",
-        "title": "צ'ק אין - Richmond Hotel Asakusa",
-        "desc": "הגעה למלון, פריקת מזוודות ורגע לנשום לפני שיוצאים לרחובות.",
-        "icon": "pin"
+        "title": "סיור ערב ברחוב Kannon",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "19:30",
-        "title": "ערב ראשון באזור Asakusa",
-        "desc": "טיילו ברחוב Kannon - סדרת מדרחובים מקורים מלאי חנויות ודוכנים, או ברחוב Orange הסטייליסטי הסמוך מלא המסעדות. בין הרחובות שוכנות סמטאות ציוריות עם מסעדות יפניות אותנטיות - כנסו לאחת מהן לארוחת ערב ברוח המקום.",
-        "icon": "food"
+        "title": "סיור ברחוב Orange",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -33,38 +30,83 @@ export const ITINERARY = [
     "date": "27.7",
     "city": "טוקיו",
     "hotel": "Richmond Hotel Asakusa",
+    "hotelAddress": "2 Chome-7-10 Asakusa, Taito City, Tokyo, Japan",
     "color": "bg-pink-400",
-    "intro": "מהמגדל הגבוה ביפן, דרך המקדש העתיק של העיר ועד לאי העתידני Odaiba.",
     "events": [
       {
-        "time": "10:00",
-        "title": "Tokyo Skytree",
-        "desc": "המגדל הגבוה ביותר ביפן. בבניין קניון ענק עם מעל 300 חנויות, פלנטריום Konica Minolta, קולנוע 4D, אקווריום Sumida וכמובן המצפה - שני מפלסים בגובה 350 ו-450 מטר. ניתן להזמין כרטיסים דרך יפן טורס.",
-        "icon": "camera"
+        "title": "ביקור ב-Tokyo Skytree",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "13:00",
-        "title": "מקדש Senso-ji ורחוב Nakamise",
-        "desc": "שער הרעם המפורסם Kaminari-mon מוביל לרחוב Nakamise - רחוב קניות מסורתי מלא דוכני ממתקי Wagashi שנראים כמו תכשיטים, מזכרות וקימונו. בסוף הרחוב שער Hozomon והמקדש העתיק ביותר בטוקיו, עם פגודת חמש הקומות האייקונית.",
-        "icon": "pin"
+        "title": "Konica Minolta Planetarium",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "15:30",
-        "title": "שייט Tokyo Cruise ל-Odaiba",
-        "desc": "הליכה של 10 דקות למזח Asakusa, ומשם מעבורת עתידנית לאי המלאכותי Odaiba. יש להזמין כרטיסים מראש. רדו בתחנת Odaiba Seaside Park.",
-        "icon": "compass"
+        "title": "אקווריום Sumida",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "16:30",
-        "title": "Odaiba - טיילת ואטרקציות",
-        "desc": "טיילת עם נוף למפרץ טוקיו, גשר הקשת ופסל החירות. פסל Unicorn Gundam הענק בכניסה ל-DiverCity. אופציות: מוזיאון המדע Miraikan (רובוטים כולל Asimo), או Joypolis - לונה פארק ענק של משחקי וידאו ומציאות מדומה.",
-        "icon": "camera"
+        "title": "מעבר ל-Asakusa Station",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "19:00",
-        "title": "teamLab Planets",
-        "desc": "גולת הכותרת של Odaiba - חוויה וירטואלית עוצרת נשימה שמפעילה את כל החושים. סדרת חללים עם טכנולוגיות אור, קול ומגע שמכניסות אתכם לעולם קסום. יש להזמין כרטיסים מראש.",
-        "icon": "camera"
+        "title": "שער Kaminari-mon",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "רחוב Nakamise",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "מקדש Senso-ji",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "פגודת חמש הקומות",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "שייט Tokyo Cruise Ship",
+        "transport": "מעבורת",
+        "voucher": false
+      },
+      {
+        "title": "טיילת Odaiba",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "פסל החירות וגשר Rainbow",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "מוזיאון Miraikan",
+        "transport": "הליכה",
+        "voucher": true
+      },
+      {
+        "title": "Tokyo Joypolis",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "פסל Unicorn Gundam",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "קניון DiverCity Tokyo Plaza",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -73,32 +115,63 @@ export const ITINERARY = [
     "date": "28.7",
     "city": "טוקיו",
     "hotel": "Richmond Hotel Asakusa",
+    "hotelAddress": "2 Chome-7-10 Asakusa, Taito City, Tokyo, Japan",
     "color": "bg-pink-400",
-    "intro": "סושי לארוחת בוקר בשוק Tsukiji, יוקרה ב-Ginza וערב אותנטי מתחת לפסי הרכבת.",
     "events": [
       {
-        "time": "08:00",
-        "title": "שוק הדגים Tsukiji",
-        "desc": "התחילו את היום בשוק המפורסם. הגיעו לתחנת Tsukiji ולכו דרומה כ-10 דקות ל-Tsukiji Outer Market. חנויות דגים, מסעדות סושי וסשימי, דונבורי, דוכני שיפודי וואגיו ועוד. אל תוותרו על ארוחת סושי בבוקר - זו דרך המקום! פתוח 5:00-14:00, הגיעו מוקדם לסחורה הטרייה.",
-        "icon": "food"
+        "title": "שוק Tsukiji Outer Market",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "11:00",
-        "title": "קניות ב-Ginza",
-        "desc": "רחוב Chuo-dori, ה'שדרה החמישית' של טוקיו. בית Seiko האייקוני עם השעון הגדול, GINZA SIX (מרכז הקניות הגדול באזור), Tokyu Plaza עם 2 קומות פטורות ממס, כלבו Mitsukoshi הוותיק מ-1930, ו-Uniqlo בחנות דגל של 12 קומות שלמות!",
-        "icon": "shop"
+        "title": "רחוב Chuo-dori",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "15:00",
+        "title": "בית Seiko",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "GINZA SIX",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "Tokyu Plaza Ginza",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "Mitsukoshi Ginza",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "Matsuya Ginza",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "Marronnier Gate",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "חנות הדגל UNIQLO",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "Art Aquarium",
-        "desc": "גלריה-מוזיאון שמציגה אקווריומים בעיצובים אומנותיים מרהיבים, עם תאורות ואלמנטים ויזואליים. הפסקה יפהפייה מהשופינג.",
-        "icon": "camera"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "18:00",
-        "title": "ערב ב-Yurakucho Gado-shita",
-        "desc": "אחד האזורים הקולינריים המיוחדים בעיר, שמתעורר לחיים סביב 17:00-18:00. מסעדות אמיתיות בנויות בין ומתחת קשתות גשר הרכבת. כאן אוכלים ושותים אנשי טוקיו האמיתיים אחרי העבודה - איזאקיות, יאקיטורי ויקיניקו.",
-        "icon": "food"
+        "title": "Yurakucho Gado-shita",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -107,26 +180,53 @@ export const ITINERARY = [
     "date": "29.7",
     "city": "טוקיו",
     "hotel": "Richmond Hotel Asakusa",
+    "hotelAddress": "2 Chome-7-10 Asakusa, Taito City, Tokyo, Japan",
     "color": "bg-pink-400",
-    "intro": "פארק Ueno הירוק, שוק Ameyoko התוסס ועיר החשמל Akihabara.",
     "events": [
       {
-        "time": "10:00",
         "title": "פארק Ueno",
-        "desc": "ריאה ירוקה עצומה בלב טוקיו. אגם Shinobazu (בקיץ פורחים בו לוטוס מים), פביליון Benten על אי במרכז האגם, ואחד משבעת המוזיאונים - Tokyo National Museum, מוזיאון הטבע והמדע (שלדי דינוזאורים), או מוזיאוני אמנות. במקום גם פסל הסמוראי האחרון Saigo Takamori.",
-        "icon": "pin"
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "13:00",
+        "title": "אגם Shinobazu",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "פביליון Benten",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "Ueno Zoo",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "פסל Saigo Takamori",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "מקדש Toshogu Shrine",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "שוק Ameyoko",
-        "desc": "שוק תוסס דרומית לפארק, מלא בכל מה שאפשר לחשוב עליו - דוכני מזון, מסעדות רחוב, אופנה, נעליים, מזוודות, מזכרות ומשחקיות. רשת מדרחובים פתוחים באווירה חיה.",
-        "icon": "shop"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "15:30",
-        "title": "Akihabara - עיר החשמל",
-        "desc": "המקה של תרבות הפופ והאנימה. משחקיות וידאו על רבי-קומות שלמים, חנויות מרצ'נדייז צבעוניות ואורות ניאון. בתי קפה של חיות: ארנבים, ינשופים (Owl Cafe), חתולים (Cat Cafe MoCHA), קיפודים ועוד - וגם Maid Cafe. שריינו מראש, הם פופולריים מאוד!",
-        "icon": "coffee"
+        "title": "Akihabara",
+        "transport": "רכבת",
+        "voucher": false
+      },
+      {
+        "title": "בתי קפה נושאיים ב-Akihabara",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -135,78 +235,93 @@ export const ITINERARY = [
     "date": "30.7",
     "city": "האקונה",
     "hotel": "Hakone Ashinoko Hanaori",
-    "color": "bg-green-400",
-    "intro": "המסלול המעגלי הקסום של האקונה - רכבות נוף, רכבלים, לוע הר געש ואגם עם ספינת פיראטים.",
+    "hotelAddress": "Ashigarashimo District, Motohakone, Hakone, Japan",
+    "color": "bg-blue-400",
     "events": [
       {
-        "time": "08:30",
-        "title": "מעבר להאקונה",
-        "desc": "שלחו את המזוודות הגדולות קדימה ליעד הבא - התחבורה בהאקונה לא בנויה למזוודות. מונית של 15 דקות לתחנת טוקיו, ומשם שינקנסן ל-Odawara. חשוב לצאת מטוקיו לא אחרי 9:00. ב-Odawara פדו את ה-Hakone Pass במשרד Odakyu.",
-        "icon": "plane"
+        "title": "נסיעה מ-Tokyo ל-Hakone",
+        "transport": "שינקנסן",
+        "voucher": false
       },
       {
-        "time": "10:30",
-        "title": "Hakone-Yumoto והרכבת הנופית",
-        "desc": "העיירה הדרומית של האקונה - רחובות ציוריים, נהר ומפל קטן עם בריכת דגי קוי. משם רכבת Tozan הנופית לכיוון Gora, שנוסעת באיטיות דרך מסילות וגשרים קטנים עם נופים עוצרי נשימה.",
-        "icon": "pin"
+        "title": "Hakone-Yumoto",
+        "transport": "רכבת",
+        "voucher": true
       },
       {
-        "time": "12:30",
+        "title": "רכבת Tozan",
+        "transport": "רכבת",
+        "voucher": false
+      },
+      {
+        "title": "Gora",
+        "transport": "רכבל",
+        "voucher": false
+      },
+      {
         "title": "עמק Owakudani",
-        "desc": "מ-Gora קרונית עד לרכבל שמגיע לעמק - לוע הר געש פעיל עם סילוני גופרית. המאכל המיוחד: ביצים שחורות שמבושלות במי הגופרית. נקודה נהדרת לצהריים. ביום בהיר ניתן לראות את הר פוג'י מנקודת התצפית.",
-        "icon": "food"
+        "transport": "רכבל",
+        "voucher": false
       },
       {
-        "time": "14:30",
-        "title": "אגם אשי וספינת הפיראטים",
-        "desc": "רכבל יורד לתחנת Togendai ולאגם אשי הרחב והיפהפה. שייט בספינת פיראטים על האגם עם נופים מזווית אחרת (שוב, ביום בהיר - פוג'י ברקע).",
-        "icon": "compass"
+        "title": "תצפית על הר Fuji",
+        "transport": "רכבל",
+        "voucher": false
       },
       {
-        "time": "16:00",
-        "title": "מקדש Hakone ושער הטורי הצף",
-        "desc": "מתחנת האוטובוס Hakonemachi-ko, מסלול רגלי קצר מוביל למקדש שינטו חבוי ביער על גדת הנהר. על המים - שער טורי צף אייקוני, אחת מתמונות החובה של האקונה.",
-        "icon": "camera"
+        "title": "אגם אשי",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "18:00",
-        "title": "מלון Hakone Ashinoko Hanaori",
-        "desc": "המלון ממש על שפת האגם, 10 דקות הליכה מתחנת Togendai. ארוחת ערב במלון ובילוי מפנק באונסן.",
-        "icon": "pin"
+        "title": "שייט ספינת הפיראטים",
+        "transport": "ספינה",
+        "voucher": false
+      },
+      {
+        "title": "מקדש Hakone Shrine",
+        "transport": "אוטובוס + הליכה",
+        "voucher": false
+      },
+      {
+        "title": "אונסן וארוחת ערב במלון",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
   {
     "day": 6,
     "date": "31.7",
-    "city": "קיוטו",
+    "city": "האקונה",
     "hotel": "Cross Hotel Kyoto",
-    "color": "bg-purple-400",
-    "intro": "מוזיאון פתוח מרהיב בהאקונה, מעבר לקיוטו וערב ראשון בלב העיר העתיקה.",
+    "hotelAddress": "71-1 Daikokucho, Nakagyo Ward, Kyoto, Japan",
+    "color": "bg-blue-400",
     "events": [
       {
-        "time": "09:30",
-        "title": "המוזיאון הפתוח (Hakone Open-Air)",
-        "desc": "אוטובוס מתחנת Kojiri ישירות למוזיאון. פארק ענק עם יצירות אמנות פזורות, מתחם פיקאסו שלם ומגדל זכוכית ויטראז' מפורסם. נחשב לאחד המוזיאונים הטובים ביפן. אפשר להשאיר מזוודות בלוקרים בתחנת Chokokunomori הסמוכה.",
-        "icon": "camera"
+        "title": "המוזיאון הפתוח של Hakone",
+        "transport": "אוטובוס",
+        "voucher": false
       },
       {
-        "time": "13:00",
-        "title": "מעבר לקיוטו",
-        "desc": "רכבת Tozan מ-Chokokunomori ל-Odawara, ומשם שינקנסן לתחנת קיוטו. מונית קצרה למלון Cross Hotel Kyoto וצ'ק אין.",
-        "icon": "plane"
+        "title": "מעבר ל-Kyoto",
+        "transport": "רכבת + שינקנסן",
+        "voucher": false
       },
       {
-        "time": "16:00",
-        "title": "שוק האוכל Nishiki",
-        "desc": "בלב Kawaramachi - הדאונטאון של קיוטו. אחד משווקי האוכל הוותיקים ביפן, פעיל מהמאה ה-17. מאות דוכני מזון: סושי טרי, ראמן, ואגיו, טמפורה ועוד. רשת מדרחובים מקורים וסמטאות ציוריות - מומלץ ללכת בהן לאיבוד.",
-        "icon": "food"
+        "title": "אזור Kawaramachi",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "19:00",
+        "title": "שוק Nishiki",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "רחוב Kiyamachi-dori",
-        "desc": "רחוב ציורי שבמרכזו תעלת מים צלולים תחת חופת עצים. פעיל בעיקר בערב - מסעדות מסורתיות, מישלן, איזאקיות קטנות, יקיניקו ובארי עמידה. כניסה לסמטאות מובילה להפתעות.",
-        "icon": "food"
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -215,44 +330,48 @@ export const ITINERARY = [
     "date": "1.8",
     "city": "קיוטו",
     "hotel": "Cross Hotel Kyoto",
-    "color": "bg-purple-400",
-    "intro": "מקדש הזהב, פארק הקופים, רכבת נוף לאורך הנהר ויער הבמבוק המפורסם.",
+    "hotelAddress": "71-1 Daikokucho, Nakagyo Ward, Kyoto, Japan",
+    "color": "bg-green-400",
     "events": [
       {
-        "time": "09:00",
-        "title": "מקדש הזהב Kinkaku-ji",
-        "desc": "אחד המקדשים היפים ביפן, קומותיו העליונות מצופות זהב - אתר מורשת עולמי ומראה עוצר נשימה. המתחם הוא גן זן ענק עם גשרים ואגמונים. פופולרי מאוד, צפו לעומס. הגעה במונית (~20 דק') או אוטובוס (~40 דק') ממרכז העיר.",
-        "icon": "camera"
+        "title": "מקדש Kinkaku-ji",
+        "transport": "מונית",
+        "voucher": false
       },
       {
-        "time": "11:00",
-        "title": "רכבת רטרו ל-Arashiyama",
-        "desc": "מתחנת Kitano-Hakubaicho רכבת עילית בסגנון רטרו עם קרונות מיוחדים ותחנות מעוצבות, שלוקחת אתכם לאזור Arashiyama המפורסם.",
-        "icon": "pin"
+        "title": "אזור Arashiyama",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "12:00",
+        "title": "גשר Togetsukyo",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "פארק הקופים Iwatayama",
-        "desc": "מעבר גשר Togetsukyo מהמאה ה-17 מעל נהר Hozu, ועלייה לראש גבעה שממנה נוף כל העיר. מפגש פנים-אל-פנים עם קופי מקוק יפניים. שימו לב לשלטים: לא ליצור קשר עין ולא להאכיל מחוץ לאזור המיועד.",
-        "icon": "camera"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "14:30",
-        "title": "רכבת הנוף Sagano",
-        "desc": "מתחנת Saga Torokko יוצאת רכבת נוף איטית צפונה-מערבה לאזורי הטבע, על צד הנהר עם נופים מרהיבים. חצי שעה עד לתחנה האחרונה Kameoka. חזרה אפשרית בשייט על הנהר (סירות שטוחות ~שעה וחצי) או ראפטינג לאמיצים.",
-        "icon": "compass"
+        "title": "רכבת Sagano Scenic",
+        "transport": "רכבת",
+        "voucher": true
       },
       {
-        "time": "16:30",
-        "title": "יער הבמבוק",
-        "desc": "סיום באזור בנקודה האייקונית ביותר - Arashiyama Bamboo Forest. בשעות אחה\"צ האור מאיר בזווית שהופכת את הביקור ליפה עוד יותר.",
-        "icon": "camera"
+        "title": "Kameoka Hozugawa river ride",
+        "transport": "שייט",
+        "voucher": true
       },
       {
-        "time": "19:30",
+        "title": "יער הבמבוקים Arashiyama",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "סמטת Pontocho",
-        "desc": "לבילוי ערב - אזור נהר Kamo וסמטת Pontocho ברוחב שני מטרים, אחת מפסגות הקולינריה של קיוטו. מסעדות אקסקלוסיביות (חלקן בהזמנה מראש). בקיץ ניתן לשבת על מרפסות מעל הנהר.",
-        "icon": "food"
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -261,32 +380,48 @@ export const ITINERARY = [
     "date": "2.8",
     "city": "קיוטו",
     "hotel": "Cross Hotel Kyoto",
-    "color": "bg-purple-400",
-    "intro": "טקס תה בקימונו ברובע הגיישות, גנים מרהיבים ומקדש Kiyomizu-dera המשקיף על העיר.",
+    "hotelAddress": "71-1 Daikokucho, Nakagyo Ward, Kyoto, Japan",
+    "color": "bg-green-400",
     "events": [
       {
-        "time": "10:00",
-        "title": "רובע Gion וטקס תה",
-        "desc": "התחילו ברובע הגיישות ההיסטורי עם טקס תה מסורתי - לבישת קימונו, הדרכה על כללי הטקס ושתיית תה בליווי ממתקים יפניים. הרובע מלא רחובות אבן ובתי עץ מתקופת אדו. רחוב Hanamikoji המרכזי - אם יתמזל מזלכם תראו גיישות (אך אין לצלם, זה אסור ונחשב הטרדה).",
-        "icon": "coffee"
+        "title": "טקס תה ברובע Gion",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "13:00",
+        "title": "Team lab",
+        "transport": "",
+        "voucher": false
+      },
+      {
+        "title": "רחוב Hanamikoji-dori",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "מקדש Kodaiji",
-        "desc": "אחת הפנינות היפות באזור. מעבר למבנה המרשים - גנים יפים כל השנה (במיוחד בפריחה ושלכת), אגמונים ואפילו יער במבוק קטן. חוויית טבע בלב העיר, הקדישו זמן לשיטוט.",
-        "icon": "pin"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "14:30",
-        "title": "רחוב Ninenzaka ומקדש Kiyomizu-dera",
-        "desc": "הדרך יפה כמו היעד - רשת רחובות עתיקים מלאי בתי עץ, דוכנים ואווירה תוססת מובילה במעלה ההר. ברחוב Ninenzaka הזדמנויות לתמונות נהדרות. במקדש עצמו: שער Nio-mon, הפגודה המפורסמת ותצפית על כל קיוטו. אתר פופולרי - צפו לעומס.",
-        "icon": "camera"
+        "title": "רחוב Ninenzaka",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "18:00",
-        "title": "מקדש Yasaka ופארק Maruyama",
-        "desc": "לקראת דמדומים חזרה צפונה למקדש Yasaka, מפורסם ב-10,000 העששיות שבמתחמו. בערב אזור Gion לובש פנים אחרות - הרחוב ליד תעלת Shirakawa עם תאורה נהדרת ועשרות מסעדות.",
-        "icon": "camera"
+        "title": "מקדש Kiyomizu-dera",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "מקדש Yasaka",
+        "transport": "מונית",
+        "voucher": false
+      },
+      {
+        "title": "פארק Maruyama",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -295,66 +430,68 @@ export const ITINERARY = [
     "date": "3.8",
     "city": "קיוטו",
     "hotel": "Cross Hotel Kyoto",
-    "color": "bg-purple-400",
-    "intro": "יום טיול ליער - מסלול הליכה קסום בין Kurama ל-Kibune, מקדשים עתיקים ואטריות על הנהר.",
+    "hotelAddress": "71-1 Daikokucho, Nakagyo Ward, Kyoto, Japan",
+    "color": "bg-green-400",
     "events": [
       {
-        "time": "09:00",
-        "title": "יציאה ל-Kurama",
-        "desc": "מתחנת Gion-Shijo רכבת של כ-30 דקות לתחנת Kurama. הליכה של 5 דקות צפונה לקרונית ההר שמעלה אתכם לראש ההר ולתחילת המסלול. שימו לב - היום כולל מסלול הליכה של כשעה וחצי ביער.",
-        "icon": "compass"
+        "title": "רכבת ל-Kurama",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "10:30",
-        "title": "מסלול הליכה ביער",
-        "desc": "מסלול עוצר נשימה של שעה וחצי המסתיים ב-Kifune Shrine. בדרך: פגודת Tahoto האדומה, מדרגות Tsuzura-ori עם עששיות אדומות, קבר הקיסרית Teimei העתיק, מתחמי מקדשים ונקודות תצפית. מסע חזרה בזמן.",
-        "icon": "pin"
+        "title": "קרונית ההר Kurama",
+        "transport": "קרונית",
+        "voucher": false
       },
       {
-        "time": "13:00",
-        "title": "עיירת Kibune",
-        "desc": "עיירה קטנה בנויה על צד הנהר עם ריוקאנים ומסעדות. בקיץ מוציאים רמפות ישיבה ממש מעל הנהר. מנת הדגל: 'אטריות מתגלשות' - במגלשות במבוק קטנות, שתופסים במקלות וטובלים ברוטב מיוחד.",
-        "icon": "food"
+        "title": "מסלול הליכה Kurama-Kibune",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "18:00",
         "title": "מקדש Kifune",
-        "desc": "הגעה בדמדומים למקדש, שגרם המדרגות המוביל אליו מואר בעששיות - מראה מרהיב. חזרה לקיוטו דרך אוטובוס קצר לתחנת Kibuneguchi ומשם רכבת של כחצי שעה.",
-        "icon": "camera"
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "עיירת Kibune",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
   {
     "day": 10,
     "date": "4.8",
-    "city": "אוסקה",
+    "city": "קיוטו",
     "hotel": "Cross Hotel Osaka",
-    "color": "bg-orange-400",
-    "intro": "מנהרת שערי הטורי בזריחה, פארק האיילים של נארה ומעבר לאוסקה התוססת.",
+    "hotelAddress": "2 Chome-5-15 Shinsaibashisuji, Chuo Ward, Osaka, Japan",
+    "color": "bg-green-400",
     "events": [
       {
-        "time": "07:30",
-        "title": "Fushimi Inari מוקדם בבוקר",
-        "desc": "התחילו מוקדם כדי להימנע מעומס. המקדש המוקדש לשועלים (מבשרי בשורות בתרבות היפנית) עם מנהרת שערי ה-Torii האינסטגרמית ביותר ביפן. השביל עולה בהר - ככל שמטפסים העומס פוחת והטבע משתלט. לא חייבים לעלות עד הפסגה.",
-        "icon": "camera"
+        "title": "מקדש Fushimi Inari",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "11:00",
-        "title": "פארק האיילים בנארה",
-        "desc": "רכבת מתחנת Inari דרך Nara Line לתחנת Nara. הפארק המפורסם עם איילים קדושים המסתובבים חופשי ומתורגלים לקוד קידה לבקשת מזון. קנו מזון ייעודי בלבד. בפארק גם מקדשים חשובים. אל תפספסו את חנות המוצ'י Nakatanidou - מופע הכנה אנרגטי וקולני עם פטישי עץ.",
-        "icon": "pin"
+        "title": "פארק Nara",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "15:00",
-        "title": "הגעה לאוסקה",
-        "desc": "רכבת Kintetsu Express לתחנת Namba, ומשם מונית למלון Cross Hotel Osaka. צ'ק אין.",
-        "icon": "plane"
+        "title": "מעבר ל-Osaka",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "17:00",
-        "title": "Shinsaibashi ו-Dotonbori",
-        "desc": "אזור Shinsaibashi - רשת מדרחובים עמוסי חנויות: מותגים, אופנה מקומית, קוסמטיקה ומזכרות. בערב המשיכו ל-Dotonbori בחלק הדרומי - מרכז חיי הלילה של אוסקה עם איזאקיות, בארים ומסעדות. שלט האיש הרץ Glico הוא נקודת הצילום המרכזית.",
-        "icon": "shop"
+        "title": "אזור Shinsaibashi",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "אזור Dotonbori",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -363,26 +500,23 @@ export const ITINERARY = [
     "date": "5.8",
     "city": "אוסקה",
     "hotel": "Cross Hotel Osaka",
-    "color": "bg-orange-400",
-    "intro": "שוק האוכל Kuromon, שופינג ב-Shinsaibashi ורובע Shinsekai הנוסטלגי.",
+    "hotelAddress": "2 Chome-5-15 Shinsaibashisuji, Chuo Ward, Osaka, Japan",
+    "color": "bg-purple-400",
     "events": [
       {
-        "time": "09:30",
-        "title": "שוק האוכל Kuromon",
-        "desc": "במרחק הליכה קצר מתחנת Namba. אחד משווקי האוכל המעניינים והוותיקים ביפן, עם מאכלים ייחודיים לאוסקה בשלל טעמים - ארוחת בוקר וטעימות מהמטבח האוסקאי.",
-        "icon": "food"
+        "title": "שוק Kuromon",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "12:00",
-        "title": "שופינג ב-Shinsaibashi",
-        "desc": "זמן חופשי במדרחוב המרכזי - רשת חנויות ענפה: מותגים מוכרים, אופנה מקומית, קוסמטיקה ומזכרות. כאן אפשר למצוא כמעט הכל.",
-        "icon": "shop"
+        "title": "אזור Shinsaibashi",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "17:00",
         "title": "רובע Shinsekai",
-        "desc": "רכבת בקו Midosuji לתחנת Dobutsuen-mae. שכונה ותיקה ומיוחדת עם אווירה נוסטלגית של שנות ה-50. מסעדות שיפודי Kushikatsu (טמפורה על שיפוד), ברים ואיזאקיות אידיליות לחוויה מקומית אותנטית וארוחת ערב אוסקאית נהדרת.",
-        "icon": "food"
+        "transport": "רכבת",
+        "voucher": false
       }
     ]
   },
@@ -391,38 +525,33 @@ export const ITINERARY = [
     "date": "6.8",
     "city": "אוסקה",
     "hotel": "Cross Hotel Osaka",
-    "color": "bg-orange-400",
-    "intro": "תצפית ממגדל Umeda, עיר האנימה Den-Den, מופע סומו חוויתי וערב אופנתי.",
+    "hotelAddress": "2 Chome-5-15 Shinsaibashisuji, Chuo Ward, Osaka, Japan",
+    "color": "bg-purple-400",
     "events": [
       {
-        "time": "10:00",
-        "title": "מגדל Umeda ותצפית",
-        "desc": "מתחנת Umeda - אחד המבנים המזוהים ביותר עם אוסקה. בקומה העליונה אחת מנקודות התצפית המושקעות ביפן, עם נוף מרהיב על העיר.",
-        "icon": "camera"
+        "title": "Umeda Sky Building",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "12:30",
-        "title": "Den-Den Town",
-        "desc": "מתחנת Namba (יציאה מזרחית) - אזור האנימה הצבעוני של אוסקה, ה'אקיהברה' המקומית. חנויות מרצ'נדייז, בתי קפה נושאיים כמו Maid Cafe, אלקטרוניקה ומשחקיות.",
-        "icon": "shop"
+        "title": "Den Den Town",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "15:00",
         "title": "Namba Parks",
-        "desc": "מרכז קניות ייחודי המעוצב כך שמרגישים כמו נמלטים מהמולת העיר - מרחבים, צמחייה ואווירה שקטה. חנויות מותגים, מסעדות, קולנוע וגן יפהפה על הגג. בערב תאורה ומיצגים נהדרים.",
-        "icon": "shop"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "17:00",
-        "title": "מופע Sumo",
-        "desc": "היכל The Sumo Hall Hirakuza Osaka. חוויה מבדרת ומרגשת - קרבות אמיתיים של לוחמי סומו מקצוענים, קומדיה ואפילו סיכוי להשתתף בקרב אם זכיתם בהגרלה. דלתות נפתחות 17:00, מופע ב-18:00. כרטיסים למושבים הקרובים לטבעת. ניתן להזמין דרך יפן טורס.",
-        "icon": "pin"
+        "title": "מופע סומו The Sumo Hall Hirakuza",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "20:30",
         "title": "Amerikamura",
-        "desc": "סיום היום באזור האופנתי הסמוך ל-Shinsaibashi - אפשרויות בילוי, מסעדות מעולות ורחובות קטנים בסטייל.",
-        "icon": "food"
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -431,38 +560,43 @@ export const ITINERARY = [
     "date": "7.8",
     "city": "טוקיו",
     "hotel": "Shibuya Stream Hotel",
+    "hotelAddress": "3 Chome-21-3 Shibuya, Tokyo, Japan",
     "color": "bg-pink-400",
-    "intro": "חזרה לטוקיו, מגדל טוקיו, משולש האמנות של Roppongi וארוחה במסעדת 'קיל ביל'.",
     "events": [
       {
-        "time": "09:00",
-        "title": "מעבר לטוקיו",
-        "desc": "שלחו את המזוודות לטוקיו יום קודם. מהמלון הליכה/מונית לתחנת Namba, קו Midosuji ל-Shin-Osaka, ומשם שינקנסן לטוקיו. בתחנת טוקיו קו Ginza עד Shibuya והליכה קצרה למלון.",
-        "icon": "plane"
+        "title": "מעבר מ-Osaka ל-Tokyo",
+        "transport": "שינקנסן",
+        "voucher": false
       },
       {
-        "time": "13:00",
-        "title": "צ'ק אין - Shibuya Stream Hotel",
-        "desc": "הגעה למלון החדש בשיבויה, פריקה ורגע מנוחה.",
-        "icon": "pin"
+        "title": "Tokyo Tower",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "15:00",
-        "title": "מגדל טוקיו",
-        "desc": "מתחנת Akabanebashi הליכה של 10 דקות למגדל המפורסם, שנבנה בהשראת מגדל אייפל. ניתן לעלות לתצפית, ובבסיס מתחם מסעדות וחנויות.",
-        "icon": "camera"
+        "title": "שכונת Azabu-Juban",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "16:30",
-        "title": "Azabu-Juban ו-Roppongi Hills",
-        "desc": "שכונת Azabu-Juban הקוסמופוליטית עם אדריכלות מיוחדת ובתי קפה. משם ל-Roppongi Hills - תצפית פנורמית 360° על טוקיו, ומוזיאון Mori לאמנות מודרנית בקומה 53. Roppongi הוא הלב האמנותי של טוקיו - בחרו מוזיאון אחד (Mori / National Art Center / Suntory).",
-        "icon": "pin"
+        "title": "Roppongi Hills",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "19:30",
-        "title": "ארוחת ערב ב-Gonpachi",
-        "desc": "המסעדה האייקונית ב-Nishi-Azabu שבה צולמה הסצנה הבלתי נשכחת מ'קיל ביל'. איזאקיה מצוינת עם גריל במרכז והמקום עצום - ממש כמו בסרט.",
-        "icon": "food"
+        "title": "Mori Art Museum",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "The National Art Center",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "מסעדת Gonpachi Nishi-Azabu",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -471,84 +605,108 @@ export const ITINERARY = [
     "date": "8.8",
     "city": "טוקיו",
     "hotel": "Shibuya Stream Hotel",
+    "hotelAddress": "3 Chome-21-3 Shibuya, Tokyo, Japan",
     "color": "bg-pink-400",
-    "intro": "יום שיבויה מלא - מעבר החציה המפורסם בעולם, פסל האצ'יקו, מגה-סטורים ושכונת Daikanyama.",
     "events": [
       {
-        "time": "10:00",
-        "title": "מעבר החציה של שיבויה",
-        "desc": "מיד ביציאה מהתחנה - מעבר החציה העמוס בעולם, שבכל רמזור ירוק חוצים אותו כ-2,000 בני אדם. קחו רגע. בקצה המערבי - פסל הכלב Hachiko, סיפור הכלב שחיכה לבעליו 9 שנים. נקודת צילום מפורסמת.",
-        "icon": "camera"
+        "title": "מעבר החציה Shibuya Crossing",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "11:00",
-        "title": "Center-Gai ומגה-סטורים",
-        "desc": "עצרו קודם לקפה בסטארבקס המפורס שצופה על המעבר (או ב-Tsutaya Share Lounge מעליו). ואז לתוך המדרחובים: ZARA הענקית, חנות הדגל של Don Quijote, H&M, חנות Jordan World of Flight (אחת משתיים בעולם!) ו-Tower Records.",
-        "icon": "shop"
+        "title": "פסל Hachiko",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "14:00",
+        "title": "רחוב Center-Gai",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "Starbucks Shibuya",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "Miyashita Park",
-        "desc": "פארק תלוי הבנוי על גג של קניון. בהליכה נדמה שאתם במפלס הקרקע, אבל בקצה מגלים את הגובה. גם עשרות קניונים באזור: Shibuya Parco (פוקימון סנטר בקומה 6), Shibuya 109 ו-Sakura Stage.",
-        "icon": "pin"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "15:30",
+        "title": "Shibuya Parco",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "שכונת Daikanyama",
-        "desc": "15 דקות הליכה משיבויה - שכונה שיקית עם חנויות בוטיק ובתי קפה, מלאה בסטייל ואווירה מקומית. מתחם T-SITE הטרנדי, וילה משומרת עם גן זן, ורחוב Log Road שהיה פסי רכבת והיום מסעדות ובוטיקים.",
-        "icon": "coffee"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "19:00",
-        "title": "ערב בשיבויה",
-        "desc": "חזרה לשיבויה לארוחת ערב. האזור מלא איזאקיות, יקיניקו וסושיות. זכרו - הרבה מסעדות בקומות העליונות של הבניינים, אל תפחדו לעלות ולבדוק לפי השלטים.",
-        "icon": "food"
+        "title": "DAIKANYAMA T-SITE",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "Log Road Daikanyama",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
   {
     "day": 15,
     "date": "9.8",
-    "city": "טוקיו",
+    "city": "קמקורה",
     "hotel": "Shibuya Stream Hotel",
-    "color": "bg-pink-400",
-    "intro": "טיול יום לחוף - הבודהה הגדול של קמקורה, מקדשים על המפרץ והאי הקסום Enoshima.",
+    "hotelAddress": "3 Chome-21-3 Shibuya, Tokyo, Japan",
+    "color": "bg-yellow-400",
     "events": [
       {
-        "time": "08:00",
-        "title": "יציאה לקמקורה",
-        "desc": "צאו מוקדם, לא אחרי 8:00. משיבויה קו Yamanote ל-Shinjuku, רכבת Shonan-Shinjuku ל-Kamakura, החלפה לחשמלית Enoden לתחנת Hase.",
-        "icon": "plane"
+        "title": "הבודהה הגדול Kotoku-in",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "10:00",
-        "title": "הבודהה הגדול",
-        "desc": "במקדש Kotoku-in - פסל ברונזה ענק מ-1252, אוצר לאומי של יפן, בגובה כ-13 מטר. אחד המראות האייקוניים באזור. 7 דקות הליכה מהתחנה.",
-        "icon": "camera"
-      },
-      {
-        "time": "11:30",
         "title": "מקדש Hasedera",
-        "desc": "10 דקות מהבודהה - מקדש בודהיסטי על ראש גבעה עם נוף לכל המפרץ. עטוף בטבע שמשנה צבעים לפי העונות. פסלים חמודים ומחייכים שהפכו לסמל המקדש.",
-        "icon": "pin"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "13:00",
         "title": "רחוב Komachi-dori",
-        "desc": "חזרה לתחנת Kamakura והרחוב הראשי התוסס - דוכנים, מסעדות מכל סוג (ממאכלי ים ועד ממתקים מקומיים) וחנויות מזכרות. משם 6 דקות למקדש Tsurugaoka Hachimangu בן 800 שנה - אולי תזכו לראות טקס חתונה מסורתי.",
-        "icon": "food"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "15:30",
-        "title": "נסיעה ל-Enoshima",
-        "desc": "חשמלית Enoden לאורך קו החוף - נוסעת לאט עם נוף עוצר נשימה של חופי קמקורה וההרים ברקע. האי הקטן מחובר בגשר של 15 דקות הליכה. רחוב Benzaiten עם חנויות ומטעמים מוביל במעלה הגבעה למקדש Enoshima (לפי האגדה מסייע במציאת אהבה וממון).",
-        "icon": "compass"
+        "title": "מקדש Tsurugaoka Hachimangu",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "18:00",
+        "title": "נסיעה בחשמלית Enoden",
+        "transport": "חשמלית",
+        "voucher": false
+      },
+      {
+        "title": "האי Enoshima",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "רחוב Enoshima Benzaiten",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "מקדש Enoshima Shrine",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "Enoshima Sea Candle",
-        "desc": "בשעות השקיעה - גן פרחים שמתמלא בתאורה נהדרת, ומגדל תצפית שממנו רואים את כל המפרץ, וביום בהיר גם את הר פוג'י. ארוחת ערב במסעדה על האי וחזרה לטוקיו.",
-        "icon": "camera"
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -557,32 +715,48 @@ export const ITINERARY = [
     "date": "10.8",
     "city": "טוקיו",
     "hotel": "Shibuya Stream Hotel",
+    "hotelAddress": "3 Chome-21-3 Shibuya, Tokyo, Japan",
     "color": "bg-pink-400",
-    "intro": "מקדש Meiji ופארק Yoyogi הירוקים, ואז הצבעוניות המטורפת של Harajuku ו-Omotesando.",
     "events": [
       {
-        "time": "09:30",
-        "title": "מקדש Meiji ופארק Yoyogi",
-        "desc": "מתחנת Harajuku (יציאה מערבית). אחת הריאות הירוקות הגדולות בטוקיו - במתחם ננטעו מעל 100,000 עצים. שער טורי ענק מעץ, שביל דרך היער (לכו בצד - המרכז שמור ל'רוחות'), קיר חביות סאקה ויין. המקדש לזכר הקיסר והקיסרית מייג'י. אפשר לקנות לוח עץ ולכתוב משאלה.",
-        "icon": "pin"
+        "title": "מקדש Meiji",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "12:00",
-        "title": "רחוב Takeshita ב-Harajuku",
-        "desc": "אחד האזורים הצבעוניים בטוקיו! מדרחוב תוסס עם דוכני מזון אינסטגרמיים, בתי קפה של חיות (קיפודים, לוטרות, כלבים, חתולים, עצלנים וקפיברות!). קרפים מפורסמים של Marion, גבינה נמתחת, ממתקים צבעוניים. שריינו בתי קפה מראש.",
-        "icon": "shop"
+        "title": "פארק Yoyogi",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "14:30",
+        "title": "רחוב Takeshita Street",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "Animal Cafes ב-Harajuku",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "Laforet Harajuku",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "Omotesando",
-        "desc": "ה'שאנז אליזה' של טוקיו - שדרה ירוקה מלאת קניונים ומותגי יוקרה בינלאומיים ומקומיים. Tokyu Plaza עם כניסת המראות האייקונית - חובה לתמונה אינסטגרמית.",
-        "icon": "shop"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "16:00",
+        "title": "Tokyu Plaza Omotesando",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "Cat Street",
-        "desc": "אחד הרחובות הסטייליסטיים בטוקיו, נמתח מ-Omotesando עד שיבויה. מלא בוטיקים יפניים צעירים ובתי קפה שיקיים, באווירה שקטה ונעימה יותר. אל תהססו להיכנס לסמטאות - שם החנויות הכי מיוחדות.",
-        "icon": "coffee"
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -590,39 +764,49 @@ export const ITINERARY = [
     "day": 17,
     "date": "11.8",
     "city": "טוקיו",
-    "hotel": "Shibuya Stream Hotel",
+    "hotel": "מסעדה",
+    "hotelAddress": "164-0001 5-50-3 Nakano, Nakano, Tokyo(397m from Nakano Station)",
     "color": "bg-pink-400",
-    "intro": "התחנה העמוסה בעולם, תצפית חינם, גן לאומי מרהיב, סמטת יאקיטורי ורובע הניאון Kabukicho.",
     "events": [
       {
-        "time": "10:00",
-        "title": "תצפית Shinjuku (חינם)",
-        "desc": "התחנה העמוסה בעולם - מעל 3 מיליון נוסעים ביום ו-58 יציאות. חפשו יציאות מערביות (יציאה 9 נוחה). תצפית חינמית מבניין הממשלה (Metropolitan Building) עם נוף עוצר נשימה, וביום בהיר גם הר פוג'י. יש רישום ותור אך ללא תשלום.",
-        "icon": "camera"
+        "title": "תצפית Tokyo Metropolitan Government Building",
+        "transport": "רכבת",
+        "voucher": false
       },
       {
-        "time": "12:30",
-        "title": "פארק Shinjuku Gyoen",
-        "desc": "אחד הפארקים הגדולים בטוקיו, הגן הלאומי והמקום האהוב על הקיסר האחרון. עבודות גינון ואדריכלות נוף מהיפות ביפן, מקורות מים, גשרים קטנים וצמחייה מעוצבת - הכל על רקע גורדי השחקים. במרכז מבנה Old Goryo-tei על אגמון.",
-        "icon": "pin"
+        "title": "Shinjuku Gyoen",
+        "transport": "מונית",
+        "voucher": false
       },
       {
-        "time": "15:00",
-        "title": "Yoyogi Broadway ושלט החתול",
-        "desc": "מתחם שיקי בעיצוב ניו-יורקי עם גלריות, מסעדות ובארים. אחר כך אחד האייקונים של שינג'וקו - שלט החתול התלת-ממדי, אשליה אופטית שנראית כאילו החתול קופץ מהשלט.",
-        "icon": "food"
+        "title": "Yoyogi Broadway",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "17:00",
+        "title": "שלט החתול התלת מימדי",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
         "title": "Omoide Yokocho",
-        "desc": "סמטת רטרו עם מסעדות זעירות של יאקיטורי - אל תתביישו לדגום כמה מקומות. אווירה אותנטית ומעושנת.",
-        "icon": "food"
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "19:30",
+        "title": "Maguro Mart",
+        "transport": "16:00",
+        "voucher": false
+      },
+      {
         "title": "Kabukicho",
-        "desc": "עם השקיעה - אחד האזורים המפורסמים בטוקיו. שלטי ניאון מכל עבר, המולה ומקומות בילוי. שימו לב: זהו גם אזור האורות האדומים - התעלמו מיחצנים. אל תפספסו את פסל הגוזילה המציץ מגג אחד הבניינים.",
-        "icon": "pin"
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "פסל Godzilla",
+        "transport": "הליכה",
+        "voucher": false
       }
     ]
   },
@@ -630,21 +814,29 @@ export const ITINERARY = [
     "day": 18,
     "date": "12.8",
     "city": "טוקיו",
-    "hotel": "Shibuya Stream Hotel",
+    "hotel": "מסעדה",
+    "hotelAddress": "164-0001 5-50-3 Nakano, Nakano, Tokyo(397m from Nakano Station)",
     "color": "bg-pink-400",
-    "intro": "בוקר אחרון לקניות אחרונות, ואז פרידה מיפן ונסיעה לשדה התעופה.",
     "events": [
       {
-        "time": "10:00",
-        "title": "השלמת קניות",
-        "desc": "זמן חופשי אחרון. שיבויה - אופנת רחוב וחנויות ענק (Zara, H&M, Air Jordan). הראג'וקו - בוטיקים של מעצבים יפניים. גינזה - יוקרה, Uniqlo, Muji ומותגי על. שלחו מזוודות לשדה עד 9:00 בבוקר יום קודם אם תרצו.",
-        "icon": "shop"
+        "title": "קניות ב-Shibuya",
+        "transport": "הליכה",
+        "voucher": false
       },
       {
-        "time": "14:00",
-        "title": "יציאה לשדה התעופה",
-        "desc": "מהמלון הליכה קצרה לתחנת Shibuya, רכבת Narita Express לשדה. ניתן גם להזמין מיני-ואן פרטי דרך יפן טורס שיאסוף מהמלון ישירות לשדה. סָיוֹנָרָה יפן! 🌸",
-        "icon": "plane"
+        "title": "קניות ב-Harajuku",
+        "transport": "הליכה",
+        "voucher": false
+      },
+      {
+        "title": "קניות ב-Ginza",
+        "transport": "רכבת",
+        "voucher": false
+      },
+      {
+        "title": "נסיעה לשדה Narita",
+        "transport": "הסעה",
+        "voucher": true
       }
     ]
   }

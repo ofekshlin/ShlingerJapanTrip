@@ -351,7 +351,7 @@ function ItineraryTab({ selectedDay, setSelectedDay }) {
         <div className="relative z-10">
           <h2 className="text-3xl font-light mb-1">{dayData.city}</h2>
           <p className="text-white/80 text-sm mb-3">יום {dayData.day} מתוך {ITINERARY.length} • {dayData.hotel}</p>
-          {dayData.intro && <p className="text-white/90 text-sm leading-snug bg-black/10 rounded-xl px-3 py-2">{dayData.intro}</p>}
+          {dayData.hotelAddress && <p className="text-white/90 text-sm leading-snug bg-black/10 rounded-xl px-3 py-2">{dayData.hotelAddress}</p>}
         </div>
       </div>
 
@@ -370,7 +370,7 @@ function ItineraryTab({ selectedDay, setSelectedDay }) {
 
               <div className="flex gap-4">
                 <div className="w-14 pt-3 text-left shrink-0">
-                  <span className="text-gray-500 text-sm font-medium">{ev.time}</span>
+                  <span className="text-gray-500 text-sm font-medium">{ev.transport}</span>
                 </div>
 
                 <div className="flex-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-50 relative">
@@ -379,7 +379,7 @@ function ItineraryTab({ selectedDay, setSelectedDay }) {
                     <span className="text-gray-400">{ICONS[ev.icon] || <MapPin size={16} />}</span>
                     <h4 className="font-bold text-gray-800 text-base">{ev.title}</h4>
                   </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{ev.desc}</p>
+                  {ev.voucher && <p className="text-sm text-green-600 font-bold leading-relaxed">יש וואצ'ר</p>}
 
                   <div className="mt-3 flex items-center gap-2">
                     <a
