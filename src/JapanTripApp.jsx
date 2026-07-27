@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Home, Map, Compass, Calendar, Menu,
   Plane, Phone, Volume2, ChevronRight, ChevronLeft,
-  Coffee, ShoppingBag, MapPin, Camera, Utensils
+  Coffee, ShoppingBag, MapPin, Camera, Utensils, Star
 } from 'lucide-react';
 import { PLACE_CATEGORIES } from './places-data.js';
 import { ITINERARY } from './itinerary-data.js';
@@ -86,13 +86,14 @@ export default function JapanTripApp() {
         {activeTab === 'map' && <MapTab />}
         {activeTab === 'places' && <PlacesTab />}
         {activeTab === 'itinerary' && <ItineraryTab selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
+        {activeTab === 'review' && <DailyReviewTab />}
         {activeTab === 'more' && <MoreTab speakJapanese={speakJapanese} />}
       </main>
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-100 flex justify-between px-6 py-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
         <NavButton id="more" icon={<Menu size={22} />} label="עוד" active={activeTab} set={setActiveTab} />
-        <NavButton id="map" icon={<Map size={22} />} label="מפה" active={activeTab} set={setActiveTab} />
+        <NavButton id="review" icon={<Star size={22} />} label="סיכום" active={activeTab} set={setActiveTab} />
         <NavButton id="places" icon={<Compass size={22} />} label="מה עושים?" active={activeTab} set={setActiveTab} />
         <NavButton id="itinerary" icon={<Calendar size={22} />} label="ימים" active={activeTab} set={setActiveTab} />
         <NavButton id="home" icon={<span className="text-2xl leading-none">⛩️</span>} label="היום" active={activeTab} set={setActiveTab} isRed />
@@ -473,6 +474,106 @@ function MoreTab({ speakJapanese }) {
 }
 
 // --- UTILS ---
+
+function DailyReviewTab() {
+  const [score, setScore] = useState(5);
+  const [surprise, setSurprise] = useState('');
+  const [tastiestFood, setTastiestFood] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // In a real app, this would save to a database
+    setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      setScore(5);
+      setSurprise('');
+      setTastiestFood('');
+    }, 3000);
+  };
+
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm">📝</div>
+        <div>
+          <h2 className="text-3xl font-light text-gray-800">סיכום יומי</h2>
+          <p className="text-gray-500 text-sm">5 דקות של רפלקציה על היום שהיה</p>
+        </div>
+      </div>
+
+      {submitted ? (
+        <div className="bg-green-50 border border-green-200 rounded-3xl p-8 text-center shadow-sm">
+          <div className="text-5xl mb-4">✨</div>
+          <h3 className="text-xl font-bold text-green-800 mb-2">הסיכום נשמר בהצלחה!</h3>
+          <p className="text-green-600">תודה ששיתפת. לילה טוב! 🌙</p>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Daily Score */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50">
+            <label className="block text-lg font-medium text-gray-800 mb-4 text-center">
+              איך היה היום מ-1 עד 10?
+            </label>
+            <div className="flex flex-col items-center gap-4">
+              <div className="text-4xl font-bold text-[#D34A3E]">{score}</div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={score}
+                onChange={(e) => setScore(parseInt(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#D34A3E]"
+              />
+              <div className="flex justify-between w-full text-xs text-gray-400 px-1">
+                <span>1 (גרוע)</span>
+                <span>10 (מושלם)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Biggest Surprise */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50">
+            <label className="block text-lg font-medium text-gray-800 mb-3">
+              מה הייתה ההפתעה הכי גדולה היום? 😲
+            </label>
+            <textarea
+              value={surprise}
+              onChange={(e) => setSurprise(e.target.value)}
+              placeholder="משהו שלא ציפיתי לו..."
+              className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#D34A3E]/50 focus:border-transparent resize-none h-24"
+              required
+            />
+          </div>
+
+          {/* Tastiest Food */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50">
+            <label className="block text-lg font-medium text-gray-800 mb-3">
+              איזה חטיף/מאכל היה הכי טעים? 🍜
+            </label>
+            <input
+              type="text"
+              value={tastiestFood}
+              onChange={(e) => setTastiestFood(e.target.value)}
+              placeholder="ראמן, מוצ'י, או אולי משהו מהקומביני?"
+              className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#D34A3E]/50 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-[#D34A3E] text-white font-bold text-lg py-4 rounded-2xl shadow-md hover:bg-[#b83d33] transition-colors active:scale-95"
+          >
+            שמור סיכום יומי
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 
 function NavButton({ icon, label, id, active, set, isRed }) {
   const isActive = active === id;
