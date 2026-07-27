@@ -218,7 +218,8 @@ function HomeTab({ setActiveTab, setSelectedDay, selectedDay }) {
 
               <div className="flex gap-4">
                 <div className="w-14 pt-3 text-left shrink-0">
-                  <span className="text-gray-500 text-sm font-medium">{ev.transport}</span>
+                  {ev.time && <div className="text-gray-800 font-bold text-sm">{ev.time}</div>}
+                    <span className="text-gray-500 text-xs font-medium">{ev.transport}</span>
                 </div>
 
                 <div className="flex-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-50 relative">
@@ -227,7 +228,8 @@ function HomeTab({ setActiveTab, setSelectedDay, selectedDay }) {
                     <span className="text-gray-400">{ICONS[ev.icon] || <MapPin size={16} />}</span>
                     <h4 className="font-bold text-gray-800 text-base">{ev.title}</h4>
                   </div>
-                  {ev.voucher && <p className="text-sm text-green-600 font-bold leading-relaxed">יש וואצ'ר</p>}
+                  {ev.desc && <p className="text-sm text-gray-600 mb-2 leading-relaxed">{ev.desc}</p>}
+                    {ev.voucher && <p className="text-sm text-green-600 font-bold leading-relaxed">יש וואצ'ר</p>}
 
                   <div className="mt-3 flex items-center gap-2">
                     <a
@@ -425,7 +427,8 @@ function ItineraryTab({ selectedDay, setSelectedDay }) {
 
               <div className="flex gap-4">
                 <div className="w-14 pt-3 text-left shrink-0">
-                  <span className="text-gray-500 text-sm font-medium">{ev.transport}</span>
+                  {ev.time && <div className="text-gray-800 font-bold text-sm">{ev.time}</div>}
+                    <span className="text-gray-500 text-xs font-medium">{ev.transport}</span>
                 </div>
 
                 <div className="flex-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-50 relative">
@@ -434,7 +437,8 @@ function ItineraryTab({ selectedDay, setSelectedDay }) {
                     <span className="text-gray-400">{ICONS[ev.icon] || <MapPin size={16} />}</span>
                     <h4 className="font-bold text-gray-800 text-base">{ev.title}</h4>
                   </div>
-                  {ev.voucher && <p className="text-sm text-green-600 font-bold leading-relaxed">יש וואצ'ר</p>}
+                  {ev.desc && <p className="text-sm text-gray-600 mb-2 leading-relaxed">{ev.desc}</p>}
+                    {ev.voucher && <p className="text-sm text-green-600 font-bold leading-relaxed">יש וואצ'ר</p>}
 
                   <div className="mt-3 flex items-center gap-2">
                     <a
