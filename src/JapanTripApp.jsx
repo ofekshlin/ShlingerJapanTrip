@@ -93,7 +93,7 @@ export default function JapanTripApp() {
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto pb-24 px-4 custom-scrollbar">
-        {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} setSelectedDay={setSelectedDay} />}
+        {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} setSelectedDay={setSelectedDay} selectedDay={selectedDay} />}
         {activeTab === 'map' && <MapTab />}
         {activeTab === 'places' && <PlacesTab />}
         {activeTab === 'itinerary' && <ItineraryTab selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
@@ -114,7 +114,7 @@ export default function JapanTripApp() {
 
 // --- TAB COMPONENTS ---
 
-function HomeTab({ setActiveTab, setSelectedDay }) {
+function HomeTab({ setActiveTab, setSelectedDay, selectedDay }) {
   const [daysLeft, setDaysLeft] = useState(0);
 
   useEffect(() => {
@@ -136,6 +136,8 @@ function HomeTab({ setActiveTab, setSelectedDay }) {
     setSelectedDay(idx);
     setActiveTab('itinerary');
   };
+
+  const dayData = ITINERARY[selectedDay];
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -184,11 +186,43 @@ function HomeTab({ setActiveTab, setSelectedDay }) {
         <Calendar size={18} /> למסלול המלא של 18 הימים
       </button>
 
-      <h3 className="text-xl font-medium text-gray-700 mb-4 px-2">בקרוב נפתח להזמנה</h3>
-      <div className="space-y-3">
-        <UpcomingCard title="teamLab Planets" date="יום 2 • 27.7" note="להזמין מראש" />
-        <UpcomingCard title="מופע Sumo (אוסקה)" date="יום 12 • 6.8" note="הגרלה לקרב" />
-        <UpcomingCard title="טקס תה בקימונו (Gion)" date="יום 8 • 2.8" note="דרך יפן טורס" />
+      <h3 className="text-xl font-medium text-gray-700 mb-4 px-2">היום: {dayData.city} (יום {dayData.day})</h3>
+      <div className="relative border-r-2 border-dashed border-gray-300 pr-6 mr-2 pb-10">
+        {dayData.events.map((ev, i) => {
+          const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.title + ' Japan')}`;
+          return (
+            <div key={i} className="mb-6 relative animate-in slide-in-from-right-4 duration-300" style={{ animationDelay: `${i * 80}ms` }}>
+              {/* Timeline Dot */}
+              <div className={`absolute -right-[31px] top-4 w-4 h-4 rounded-full ${dayData.color} border-4 border-[#FDF8EE]`}></div>
+
+              <div className="flex gap-4">
+                <div className="w-14 pt-3 text-left shrink-0">
+                  <span className="text-gray-500 text-sm font-medium">{ev.transport}</span>
+                </div>
+
+                <div className="flex-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-50 relative">
+                  <div className={`absolute top-0 right-0 w-1 h-full ${dayData.color} rounded-r-2xl`}></div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-gray-400">{ICONS[ev.icon] || <MapPin size={16} />}</span>
+                    <h4 className="font-bold text-gray-800 text-base">{ev.title}</h4>
+                  </div>
+                  {ev.voucher && <p className="text-sm text-green-600 font-bold leading-relaxed">יש וואצ'ר</p>}
+
+                  <div className="mt-3 flex items-center gap-2">
+                    <a
+                      href={mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-500 font-medium flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-lg"
+                    >
+                      <MapPin size={12} /> נווט במפה
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
