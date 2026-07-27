@@ -57,8 +57,19 @@ const TRIP_DATA = {
 
 // --- MAIN APP COMPONENT ---
 export default function JapanTripApp() {
-  const [activeTab, setActiveTab] = useState('home');
-  const [selectedDay, setSelectedDay] = useState(0);
+  const getInitialDayIndex = () => {
+    const today = new Date();
+    let idx = 0;
+    ITINERARY.forEach((d, i) => {
+      const [dd, mm] = d.date.split('.').map(Number);
+      const dDate = new Date(2026, mm - 1, dd);
+      if (today >= dDate) idx = i;
+    });
+    return idx;
+  };
+
+  const [activeTab, setActiveTab] = useState('itinerary');
+  const [selectedDay, setSelectedDay] = useState(getInitialDayIndex());
 
   const speakJapanese = (text = '') => {
     if ('speechSynthesis' in window) {
