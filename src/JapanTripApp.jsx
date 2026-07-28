@@ -7,8 +7,9 @@ import {
 } from 'lucide-react';
 import { PLACE_CATEGORIES } from './places-data.js';
 import { ITINERARY } from './itinerary-data.js';
-import { db } from './firebase.js';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db, auth, googleProvider } from './firebase.js';
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
 // Your live Google My Maps (740 places, colored by category)
 const MY_MAPS_ID = '1I0o12hoecmBorcEsinQqw4nhTDG7adU';
@@ -59,6 +60,31 @@ const TRIP_DATA = {
 
 // --- MAIN APP COMPONENT ---
 export default function JapanTripApp() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Error signing in with Google", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out", error);
+    }
+  };
+
   const getInitialDayIndex = () => {
     const today = new Date();
     let idx = 0;
@@ -87,10 +113,22 @@ export default function JapanTripApp() {
     <div dir="rtl" className="w-full max-w-md mx-auto bg-[#FDF8EE] min-h-screen relative font-sans text-gray-800 shadow-xl overflow-hidden flex flex-col">
 
       {/* Header */}
-      <header className="pt-10 pb-4 px-6 text-center z-10 bg-[#FDF8EE]/90 backdrop-blur-sm sticky top-0">
-        <h1 className="text-xl font-light tracking-wide text-gray-600 flex items-center justify-center gap-2">
+      <header className="pt-10 pb-4 px-6 z-10 bg-[#FDF8EE]/90 backdrop-blur-sm sticky top-0 flex justify-between items-center">
+        <h1 className="text-xl font-light tracking-wide text-gray-600 flex items-center gap-2">
           <span className="text-[#D34A3E]">⛩️</span> יפן 2026
         </h1>
+        <div>
+          {user ? (
+            <div className="flex items-center gap-2">
+              <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full border border-gray-200" />
+              <button onClick={handleLogout} className="text-xs text-gray-500 hover:text-gray-800">התנתק</button>
+            </div>
+          ) : (
+            <button onClick={handleLogin} className="text-sm bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100 text-gray-600 hover:bg-gray-50">
+              התחבר
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Main Content Area */}
@@ -99,7 +137,7 @@ export default function JapanTripApp() {
         {activeTab === 'map' && <MapTab />}
         {activeTab === 'places' && <PlacesTab />}
         {activeTab === 'itinerary' && <ItineraryTab selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
-        {activeTab === 'review' && <DailyReviewTab />}
+        {activeTab === 'review' && <DailyReviewTab user={user} handleLogin={handleLogin} />}
         {activeTab === 'more' && <MoreTab speakJapanese={speakJapanese} />}
       </main>
 
@@ -547,13 +585,44 @@ function MoreTab({ speakJapanese }) {
 
 // --- UTILS ---
 
-function DailyReviewTab() {
+function DailyReviewTab({ user, handleLogin }) {
   const [score, setScore] = useState(5);
   const [surprise, setSurprise] = useState('');
   const [tastiestFood, setTastiestFood] = useState('');
   const [topAttractions, setTopAttractions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [hasSubmittedToday, setHasSubmittedToday] = useState(false);
+  const [isLoadingCheck, setIsLoadingCheck] = useState(true);
+
+  useEffect(() => {
+    const checkTodaySubmission = async () => {
+      if (!user) {
+        setIsLoadingCheck(false);
+        return;
+      }
+      
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const q = query(
+          collection(db, 'daily_reviews'), 
+          where('userId', '==', user.uid),
+          where('date', '==', today)
+        );
+        
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          setHasSubmittedToday(true);
+        }
+      } catch (err) {
+        console.error("Error checking submissions:", err);
+      } finally {
+        setIsLoadingCheck(false);
+      }
+    };
+
+    checkTodaySubmission();
+  }, [user]);
 
   // Flatten all places from categories for the search
   const allPlaces = React.useMemo(() => {
@@ -587,6 +656,9 @@ function DailyReviewTab() {
 
     try {
       await addDoc(collection(db, 'daily_reviews'), {
+        userId: user.uid,
+        userName: user.displayName,
+        userPhoto: user.photoURL,
         score,
         surprise,
         tastiestFood,
@@ -596,6 +668,7 @@ function DailyReviewTab() {
       });
 
       setSubmitted(true);
+      setHasSubmittedToday(true);
       setTimeout(() => {
         setSubmitted(false);
         setScore(5);
@@ -610,6 +683,41 @@ function DailyReviewTab() {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoadingCheck) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-8 h-8 border-4 border-[#D34A3E] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10 text-center mt-10">
+        <div className="text-6xl mb-6">🔒</div>
+        <h2 className="text-2xl font-light text-gray-800 mb-4">יש להתחבר כדי לכתוב סיכום</h2>
+        <p className="text-gray-500 mb-8">התחבר עם חשבון גוגל כדי לשמור את החוויות שלך</p>
+        <button 
+          onClick={handleLogin}
+          className="bg-white border border-gray-200 text-gray-700 font-medium py-3 px-8 rounded-full shadow-sm hover:bg-gray-50 transition-colors flex items-center gap-3 mx-auto"
+        >
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+          התחבר עם גוגל
+        </button>
+      </div>
+    );
+  }
+
+  if (hasSubmittedToday && !submitted) {
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10 text-center mt-10">
+        <div className="text-6xl mb-6">✅</div>
+        <h2 className="text-2xl font-light text-gray-800 mb-4">כבר הגשת סיכום היום!</h2>
+        <p className="text-gray-500">תודה ששיתפת. נתראה מחר! 🌙</p>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
