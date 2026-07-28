@@ -549,7 +549,31 @@ function DailyReviewTab() {
   const [score, setScore] = useState(5);
   const [surprise, setSurprise] = useState('');
   const [tastiestFood, setTastiestFood] = useState('');
+  const [topAttractions, setTopAttractions] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  // Flatten all places from categories for the search
+  const allPlaces = React.useMemo(() => {
+    return PLACE_CATEGORIES.flatMap(cat => 
+      cat.places.map(place => ({ ...place, categoryIcon: cat.icon, categoryTitle: cat.title }))
+    );
+  }, []);
+
+  const filteredPlaces = searchQuery.trim() === '' 
+    ? [] 
+    : allPlaces.filter(place => place.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5);
+
+  const handleAddAttraction = (place) => {
+    if (topAttractions.length < 3 && !topAttractions.find(p => p.name === place.name)) {
+      setTopAttractions([...topAttractions, place]);
+      setSearchQuery('');
+    }
+  };
+
+  const handleRemoveAttraction = (placeName) => {
+    setTopAttractions(topAttractions.filter(p => p.name !== placeName));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -560,6 +584,7 @@ function DailyReviewTab() {
       setScore(5);
       setSurprise('');
       setTastiestFood('');
+      setTopAttractions([]);
     }, 3000);
   };
 
@@ -631,6 +656,74 @@ function DailyReviewTab() {
               required
             />
           </div>
+
+          {/* Top 3 Attractions */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50">
+            <label className="block text-lg font-medium text-gray-800 mb-3">
+              מה היו 3 האטרקציות הכי טובות היום? 🏆
+            </label>
+            
+            {/* Selected Attractions */}
+            <div className="space-y-2 mb-4">
+              {topAttractions.map((place, idx) => (
+                <div key={idx} className="flex items-center justify-between bg-[#FAF3E0] p-3 rounded-xl border border-[#EADDC2]">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{place.categoryIcon}</span>
+                    <span className="font-medium text-gray-800">{place.name}</span>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => handleRemoveAttraction(place.name)}
+                    className="text-gray-400 hover:text-red-500 p-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              {topAttractions.length === 0 && (
+                <div className="text-center p-4 text-gray-400 text-sm border-2 border-dashed border-gray-200 rounded-xl">
+                  עדיין לא נבחרו אטרקציות
+                </div>
+              )}
+            </div>
+
+            {/* Search Input */}
+            {topAttractions.length < 3 && (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="חיפוש אטרקציה..."
+                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#D34A3E]/50 focus:border-transparent"
+                />
+                
+                {/* Search Results Dropdown */}
+                {filteredPlaces.length > 0 && (
+                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden">
+                    {filteredPlaces.map((place, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleAddAttraction(place)}
+                        className="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 border-b border-gray-50 last:border-0"
+                      >
+                        <span className="text-xl">{place.categoryIcon}</span>
+                        <div>
+                          <div className="font-medium text-gray-800">{place.name}</div>
+                          <div className="text-xs text-gray-400">{place.categoryTitle}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="text-left mt-2 text-xs text-gray-400">
+              נבחרו {topAttractions.length} מתוך 3
+            </div>
+          </div>
+
 
           <button
             type="submit"
