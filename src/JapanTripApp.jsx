@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { PLACE_CATEGORIES } from './places-data.js';
 import { ITINERARY } from './itinerary-data.js';
+import { db } from './firebase.js';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 // Your live Google My Maps (740 places, colored by category)
 const MY_MAPS_ID = '1I0o12hoecmBorcEsinQqw4nhTDG7adU';
@@ -575,17 +577,38 @@ function DailyReviewTab() {
     setTopAttractions(topAttractions.filter(p => p.name !== placeName));
   };
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, this would save to a database
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setScore(5);
-      setSurprise('');
-      setTastiestFood('');
-      setTopAttractions([]);
-    }, 3000);
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      await addDoc(collection(db, 'daily_reviews'), {
+        score,
+        surprise,
+        tastiestFood,
+        topAttractions: topAttractions.map(p => p.name),
+        createdAt: serverTimestamp(),
+        date: new Date().toISOString().split('T')[0] // YYYY-MM-DD
+      });
+
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        setScore(5);
+        setSurprise('');
+        setTastiestFood('');
+        setTopAttractions([]);
+      }, 3000);
+    } catch (err) {
+      console.error("Error adding document: ", err);
+      setError("אירעה שגיאה בשמירת הסיכום. אנא נסה שוב.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -725,11 +748,27 @@ function DailyReviewTab() {
           </div>
 
 
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-center border border-red-100">
+              {error}
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-[#D34A3E] text-white font-bold text-lg py-4 rounded-2xl shadow-md hover:bg-[#b83d33] transition-colors active:scale-95"
+            disabled={isSubmitting}
+            className={`w-full text-white font-bold text-lg py-4 rounded-2xl shadow-md transition-colors active:scale-95 flex justify-center items-center gap-2 ${
+              isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#D34A3E] hover:bg-[#b83d33]'
+            }`}
           >
-            שמור סיכום יומי
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                שומר...
+              </>
+            ) : (
+              'שמור סיכום יומי'
+            )}
           </button>
         </form>
       )}
