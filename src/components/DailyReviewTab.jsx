@@ -21,16 +21,28 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
       }
 
       try {
-        const today = new Date().toISOString().split('T')[0];
+        const dayData = ITINERARY[selectedDay];
+        if (!dayData) {
+          setIsLoadingCheck(false);
+          return;
+        }
+        
+        // Parse the date from ITINERARY (format: "DD.MM")
+        const [day, month] = dayData.date.split('.');
+        const year = new Date().getFullYear(); // Assuming current year
+        const reviewDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
         const q = query(
           collection(db, 'daily_reviews'),
           where('userId', '==', user.uid),
-          where('date', '==', today)
+          where('date', '==', reviewDate)
         );
 
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           setHasSubmittedToday(true);
+        } else {
+          setHasSubmittedToday(false);
         }
       } catch (err) {
         console.error("Error checking submissions:", err);
@@ -40,7 +52,7 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
     };
 
     checkTodaySubmission();
-  }, [user]);
+  }, [user, selectedDay]);
 
   const dayData = ITINERARY[selectedDay];
   const dailyEvents = dayData ? dayData.events : [];
@@ -62,6 +74,11 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
     setError(null);
 
     try {
+      const dayData = ITINERARY[selectedDay];
+      const [day, month] = dayData.date.split('.');
+      const year = new Date().getFullYear();
+      const reviewDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
       await addDoc(collection(db, 'daily_reviews'), {
         userId: user.uid,
         userName: user.displayName,
@@ -71,7 +88,7 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
         tastiestFood,
         topAttractions,
         createdAt: serverTimestamp(),
-        date: new Date().toISOString().split('T')[0] // YYYY-MM-DD
+        date: reviewDate
       });
 
       setSubmitted(true);
@@ -120,7 +137,7 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
     return (
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10 text-center mt-10">
         <div className="text-6xl mb-6">✅</div>
-        <h2 className="text-2xl font-light text-gray-800 mb-4">כבר הגשת סיכום היום!</h2>
+        <h2 className="text-2xl font-light text-gray-800 mb-4">כבר הגשת סיכום ליום זה!</h2>
         <p className="text-gray-500">תודה ששיתפת. נתראה מחר! 🌙</p>
       </div>
     );
@@ -131,7 +148,7 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm">📝</div>
         <div>
-          <h2 className="text-3xl font-light text-gray-800">סיכום יומי</h2>
+          <h2 className="text-3xl font-light text-gray-800">סיכום יומי - יום {selectedDay + 1}</h2>
           <p className="text-gray-500 text-sm">5 דקות של רפלקציה על היום שהיה</p>
         </div>
       </div>

@@ -16,6 +16,7 @@ export default function ReviewSummaryTab({ user, handleLogin }) {
       }
 
       try {
+        // Get yesterday's date in YYYY-MM-DD format
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayStr = yesterday.toISOString().split('T')[0];
