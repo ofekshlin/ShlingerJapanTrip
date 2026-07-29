@@ -3,10 +3,14 @@ import React, { useState, useEffect } from 'react';
 import {
   Home, Map, Compass, Calendar, Menu,
   Plane, Phone, Volume2, ChevronRight, ChevronLeft,
-  Coffee, ShoppingBag, MapPin, Camera, Utensils
+  Coffee, ShoppingBag, MapPin, Camera, Utensils, Star
 } from 'lucide-react';
 import { PLACE_CATEGORIES } from './places-data.js';
 import { ITINERARY } from './itinerary-data.js';
+import { auth, googleProvider } from './firebase.js';
+import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import DailyReviewTab from './components/DailyReviewTab.jsx';
+import ReviewSummaryTab from './components/ReviewSummaryTab.jsx';
 
 // Your live Google My Maps (740 places, colored by category)
 const MY_MAPS_ID = '1I0o12hoecmBorcEsinQqw4nhTDG7adU';
@@ -57,6 +61,35 @@ const TRIP_DATA = {
 
 // --- MAIN APP COMPONENT ---
 export default function JapanTripApp() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const [loginError, setLoginError] = useState(null);
+
+  const handleLogin = async () => {
+    try {
+      setLoginError(null);
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Error signing in with Google", error);
+      setLoginError(error.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out", error);
+    }
+  };
+
   const getInitialDayIndex = () => {
     const today = new Date();
     let idx = 0;
@@ -85,10 +118,25 @@ export default function JapanTripApp() {
     <div dir="rtl" className="w-full max-w-md mx-auto bg-[#FDF8EE] min-h-screen relative font-sans text-gray-800 shadow-xl overflow-hidden flex flex-col">
 
       {/* Header */}
-      <header className="pt-10 pb-4 px-6 text-center z-10 bg-[#FDF8EE]/90 backdrop-blur-sm sticky top-0">
-        <h1 className="text-xl font-light tracking-wide text-gray-600 flex items-center justify-center gap-2">
+      <header className="pt-10 pb-4 px-6 z-10 bg-[#FDF8EE]/90 backdrop-blur-sm sticky top-0 flex justify-between items-center">
+        <h1 className="text-xl font-light tracking-wide text-gray-600 flex items-center gap-2">
           <span className="text-[#D34A3E]">⛩️</span> יפן 2026
         </h1>
+        <div>
+          {user ? (
+            <div className="flex items-center gap-2">
+              <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full border border-gray-200" />
+              <button onClick={handleLogout} className="text-xs text-gray-500 hover:text-gray-800">התנתק</button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-end">
+              <button onClick={handleLogin} className="text-sm bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100 text-gray-600 hover:bg-gray-50">
+                התחבר
+              </button>
+              {loginError && <span className="text-xs text-red-500 mt-1">{loginError}</span>}
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Main Content Area */}
@@ -97,13 +145,16 @@ export default function JapanTripApp() {
         {activeTab === 'map' && <MapTab />}
         {activeTab === 'places' && <PlacesTab />}
         {activeTab === 'itinerary' && <ItineraryTab selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
+        {activeTab === 'review' && <DailyReviewTab user={user} handleLogin={handleLogin} selectedDay={selectedDay} />}
+        {activeTab === 'summary' && <ReviewSummaryTab user={user} handleLogin={handleLogin} />}
         {activeTab === 'more' && <MoreTab speakJapanese={speakJapanese} />}
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-100 flex justify-between px-6 py-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      <nav className="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-100 flex justify-between px-2 py-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-x-auto">
         <NavButton id="more" icon={<Menu size={22} />} label="עוד" active={activeTab} set={setActiveTab} />
-        <NavButton id="map" icon={<Map size={22} />} label="מפה" active={activeTab} set={setActiveTab} />
+        <NavButton id="summary" icon={<span className="text-xl leading-none">📊</span>} label="סיכומים" active={activeTab} set={setActiveTab} />
+        <NavButton id="review" icon={<Star size={22} />} label="סיכום" active={activeTab} set={setActiveTab} />
         <NavButton id="places" icon={<Compass size={22} />} label="מה עושים?" active={activeTab} set={setActiveTab} />
         <NavButton id="itinerary" icon={<Calendar size={22} />} label="ימים" active={activeTab} set={setActiveTab} />
         <NavButton id="home" icon={<span className="text-2xl leading-none">⛩️</span>} label="היום" active={activeTab} set={setActiveTab} isRed />
@@ -544,6 +595,7 @@ function MoreTab({ speakJapanese }) {
 
 // --- UTILS ---
 
+
 function NavButton({ icon, label, id, active, set, isRed }) {
   const isActive = active === id;
   return (
@@ -563,19 +615,3 @@ function NavButton({ icon, label, id, active, set, isRed }) {
   );
 }
 
-function UpcomingCard({ title, date, note }) {
-  return (
-    <div className="bg-white rounded-2xl p-4 flex items-center justify-between shadow-sm border border-gray-50">
-      <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-xl shadow-inner">
-        🗓️
-      </div>
-      <div className="text-right flex-1 pr-4">
-        <h4 className="font-bold text-gray-800 text-lg">{title}</h4>
-        <p className="text-gray-500 text-xs">{date}</p>
-      </div>
-      <div className="bg-[#FAF3E0] text-[#8C7A58] text-xs px-3 py-1.5 rounded-full font-medium max-w-[90px] text-center leading-tight">
-        {note}
-      </div>
-    </div>
-  );
-}
