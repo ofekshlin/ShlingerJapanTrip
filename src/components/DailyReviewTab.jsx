@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase.js';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
-import { PLACE_CATEGORIES } from '../places-data.js';
+import { ITINERARY } from '../itinerary-data.js';
 
-export default function DailyReviewTab({ user, handleLogin }) {
+export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
   const [score, setScore] = useState(5);
   const [surprise, setSurprise] = useState('');
   const [tastiestFood, setTastiestFood] = useState('');
@@ -42,26 +42,15 @@ export default function DailyReviewTab({ user, handleLogin }) {
     checkTodaySubmission();
   }, [user]);
 
-  // Flatten all places from categories for the search
-  const allPlaces = React.useMemo(() => {
-    return PLACE_CATEGORIES.flatMap(cat =>
-      cat.places.map(place => ({ ...place, categoryIcon: cat.icon, categoryTitle: cat.title }))
-    );
-  }, []);
+  const dayData = ITINERARY[selectedDay];
+  const dailyEvents = dayData ? dayData.events : [];
 
-  const filteredPlaces = searchQuery.trim() === ''
-    ? []
-    : allPlaces.filter(place => place.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5);
-
-  const handleAddAttraction = (place) => {
-    if (topAttractions.length < 3 && !topAttractions.find(p => p.name === place.name)) {
-      setTopAttractions([...topAttractions, place]);
-      setSearchQuery('');
+  const handleToggleAttraction = (eventTitle) => {
+    if (topAttractions.includes(eventTitle)) {
+      setTopAttractions(topAttractions.filter(t => t !== eventTitle));
+    } else if (topAttractions.length < 3) {
+      setTopAttractions([...topAttractions, eventTitle]);
     }
-  };
-
-  const handleRemoveAttraction = (placeName) => {
-    setTopAttractions(topAttractions.filter(p => p.name !== placeName));
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,7 +69,7 @@ export default function DailyReviewTab({ user, handleLogin }) {
         score,
         surprise,
         tastiestFood,
-        topAttractions: topAttractions.map(p => p.name),
+        topAttractions,
         createdAt: serverTimestamp(),
         date: new Date().toISOString().split('T')[0] // YYYY-MM-DD
       });
@@ -212,62 +201,36 @@ export default function DailyReviewTab({ user, handleLogin }) {
               מה היו 3 האטרקציות הכי טובות היום? 🏆
             </label>
 
-            {/* Selected Attractions */}
-            <div className="space-y-2 mb-4">
-              {topAttractions.map((place, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-[#FAF3E0] p-3 rounded-xl border border-[#EADDC2]">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{place.categoryIcon}</span>
-                    <span className="font-medium text-gray-800">{place.name}</span>
-                  </div>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {dailyEvents.map((event, idx) => {
+                const isSelected = topAttractions.includes(event.title);
+                const isDisabled = !isSelected && topAttractions.length >= 3;
+                return (
                   <button
+                    key={idx}
                     type="button"
-                    onClick={() => handleRemoveAttraction(place.name)}
-                    className="text-gray-400 hover:text-red-500 p-1"
+                    onClick={() => handleToggleAttraction(event.title)}
+                    disabled={isDisabled}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
+                      isSelected
+                        ? 'bg-[#D34A3E] text-white border-[#D34A3E]'
+                        : isDisabled
+                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                        : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                    }`}
                   >
-                    ✕
+                    {event.title}
                   </button>
-                </div>
-              ))}
-              {topAttractions.length === 0 && (
-                <div className="text-center p-4 text-gray-400 text-sm border-2 border-dashed border-gray-200 rounded-xl">
-                  עדיין לא נבחרו אטרקציות
-                </div>
-              )}
+                );
+              })}
             </div>
-
-            {/* Search Input */}
-            {topAttractions.length < 3 && (
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="חיפוש אטרקציה..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#D34A3E]/50 focus:border-transparent"
-                />
-
-                {/* Search Results Dropdown */}
-                {filteredPlaces.length > 0 && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden">
-                    {filteredPlaces.map((place, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => handleAddAttraction(place)}
-                        className="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 border-b border-gray-50 last:border-0"
-                      >
-                        <span className="text-xl">{place.categoryIcon}</span>
-                        <div>
-                          <div className="font-medium text-gray-800">{place.name}</div>
-                          <div className="text-xs text-gray-400">{place.categoryTitle}</div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+            
+            {dailyEvents.length === 0 && (
+              <div className="text-center p-4 text-gray-400 text-sm border-2 border-dashed border-gray-200 rounded-xl">
+                אין אטרקציות מתוכננות להיום
               </div>
             )}
+
             <div className="text-left mt-2 text-xs text-gray-400">
               נבחרו {topAttractions.length} מתוך 3
             </div>

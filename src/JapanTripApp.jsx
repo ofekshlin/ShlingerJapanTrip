@@ -144,7 +144,7 @@ export default function JapanTripApp() {
         {activeTab === 'map' && <MapTab />}
         {activeTab === 'places' && <PlacesTab />}
         {activeTab === 'itinerary' && <ItineraryTab selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
-        {activeTab === 'review' && <DailyReviewTab user={user} handleLogin={handleLogin} />}
+        {activeTab === 'review' && <DailyReviewTab user={user} handleLogin={handleLogin} selectedDay={selectedDay} />}
         {activeTab === 'more' && <MoreTab speakJapanese={speakJapanese} />}
       </main>
 
