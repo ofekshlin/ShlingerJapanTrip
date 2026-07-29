@@ -10,6 +10,7 @@ import { ITINERARY } from './itinerary-data.js';
 import { auth, googleProvider } from './firebase.js';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import DailyReviewTab from './components/DailyReviewTab.jsx';
+import ReviewSummaryTab from './components/ReviewSummaryTab.jsx';
 
 // Your live Google My Maps (740 places, colored by category)
 const MY_MAPS_ID = '1I0o12hoecmBorcEsinQqw4nhTDG7adU';
@@ -145,12 +146,14 @@ export default function JapanTripApp() {
         {activeTab === 'places' && <PlacesTab />}
         {activeTab === 'itinerary' && <ItineraryTab selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
         {activeTab === 'review' && <DailyReviewTab user={user} handleLogin={handleLogin} selectedDay={selectedDay} />}
+        {activeTab === 'summary' && <ReviewSummaryTab user={user} handleLogin={handleLogin} />}
         {activeTab === 'more' && <MoreTab speakJapanese={speakJapanese} />}
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-100 flex justify-between px-6 py-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      <nav className="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-100 flex justify-between px-2 py-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-x-auto">
         <NavButton id="more" icon={<Menu size={22} />} label="עוד" active={activeTab} set={setActiveTab} />
+        <NavButton id="summary" icon={<span className="text-xl leading-none">📊</span>} label="סיכומים" active={activeTab} set={setActiveTab} />
         <NavButton id="review" icon={<Star size={22} />} label="סיכום" active={activeTab} set={setActiveTab} />
         <NavButton id="places" icon={<Compass size={22} />} label="מה עושים?" active={activeTab} set={setActiveTab} />
         <NavButton id="itinerary" icon={<Calendar size={22} />} label="ימים" active={activeTab} set={setActiveTab} />
