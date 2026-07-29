@@ -585,27 +585,6 @@ function MoreTab({ speakJapanese }) {
 
 // --- UTILS ---
 
-                  </div>
-                )}
-            className={`w-full text-white font-bold text-lg py-4 rounded-2xl shadow-md transition-colors active:scale-95 flex justify-center items-center gap-2 ${
-              isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#D34A3E] hover:bg-[#b83d33]'
-            }`}
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                שומר...
-              </>
-            ) : (
-              'שמור סיכום יומי'
-            )}
-          </button>
-        </form>
-      )}
-    </div>
-  );
-}
-
 
 function NavButton({ icon, label, id, active, set, isRed }) {
   const isActive = active === id;
