@@ -69,11 +69,15 @@ export default function JapanTripApp() {
     return () => unsubscribe();
   }, []);
 
+  const [loginError, setLoginError] = useState(null);
+
   const handleLogin = async () => {
     try {
+      setLoginError(null);
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Error signing in with Google", error);
+      setLoginError(error.message);
     }
   };
 
@@ -124,9 +128,12 @@ export default function JapanTripApp() {
               <button onClick={handleLogout} className="text-xs text-gray-500 hover:text-gray-800">התנתק</button>
             </div>
           ) : (
-            <button onClick={handleLogin} className="text-sm bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100 text-gray-600 hover:bg-gray-50">
-              התחבר
-            </button>
+            <div className="flex flex-col items-end">
+              <button onClick={handleLogin} className="text-sm bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100 text-gray-600 hover:bg-gray-50">
+                התחבר
+              </button>
+              {loginError && <span className="text-xs text-red-500 mt-1">{loginError}</span>}
+            </div>
           )}
         </div>
       </header>
