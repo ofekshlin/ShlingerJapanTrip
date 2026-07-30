@@ -8,6 +8,8 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
   const [surprise, setSurprise] = useState('');
   const [tastiestFood, setTastiestFood] = useState('');
   const [topAttractions, setTopAttractions] = useState([]);
+  const [additionalAttractions, setAdditionalAttractions] = useState('');
+  const [freeText, setFreeText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [hasSubmittedToday, setHasSubmittedToday] = useState(false);
@@ -87,6 +89,8 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
         surprise,
         tastiestFood,
         topAttractions,
+        additionalAttractions,
+        freeText,
         createdAt: serverTimestamp(),
         date: reviewDate
       });
@@ -99,6 +103,8 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
         setSurprise('');
         setTastiestFood('');
         setTopAttractions([]);
+        setAdditionalAttractions('');
+        setFreeText('');
       }, 3000);
     } catch (err) {
       console.error("Error adding document: ", err);
@@ -251,6 +257,32 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
             <div className="text-left mt-2 text-xs text-gray-400">
               נבחרו {topAttractions.length} מתוך 3
             </div>
+            
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                אטרקציות נוספות שלא ברשימה:
+              </label>
+              <input
+                type="text"
+                value={additionalAttractions}
+                onChange={(e) => setAdditionalAttractions(e.target.value)}
+                placeholder="הוסף אטרקציות נוספות..."
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#D34A3E]/50 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Free Text */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50">
+            <label className="block text-lg font-medium text-gray-800 mb-3">
+              מה עוד תרצה להגיד על היום? 💭
+            </label>
+            <textarea
+              value={freeText}
+              onChange={(e) => setFreeText(e.target.value)}
+              placeholder="מחשבות, חוויות, או כל דבר אחר..."
+              className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#D34A3E]/50 focus:border-transparent resize-none h-24"
+            />
           </div>
 
 

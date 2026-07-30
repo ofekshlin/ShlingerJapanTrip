@@ -140,7 +140,20 @@ export default function ReviewSummaryTab({ user, handleLogin, selectedDay }) {
                   ) : (
                     <p className="text-gray-500 text-sm italic">לא נבחרו אטרקציות</p>
                   )}
+                  {review.additionalAttractions && (
+                    <div className="mt-2">
+                      <h5 className="text-xs font-medium text-gray-400 mb-1">אטרקציות נוספות:</h5>
+                      <p className="text-gray-800 bg-gray-50 p-2 rounded-lg text-sm">{review.additionalAttractions}</p>
+                    </div>
+                  )}
                 </div>
+
+                {review.freeText && (
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-1">עוד משהו 💭</h4>
+                    <p className="text-gray-800 bg-gray-50 p-3 rounded-xl">{review.freeText}</p>
+                  </div>
+                )}
               </div>
             </div>
           ))}
