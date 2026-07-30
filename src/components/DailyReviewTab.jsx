@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase.js';
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { ITINERARY } from '../itinerary-data.js';
 
-export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
+export default function DailyReviewTab({ user, handleLogin, selectedDay, setSelectedDay }) {
   const [score, setScore] = useState(5);
   const [surprise, setSurprise] = useState('');
   const [tastiestFood, setTastiestFood] = useState('');
   const [topAttractions, setTopAttractions] = useState([]);
+  const [additionalAttractions, setAdditionalAttractions] = useState('');
+  const [freeText, setFreeText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [hasSubmittedToday, setHasSubmittedToday] = useState(false);
   const [isLoadingCheck, setIsLoadingCheck] = useState(true);
+  const [existingReviewId, setExistingReviewId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const checkTodaySubmission = async () => {
@@ -41,8 +45,24 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           setHasSubmittedToday(true);
+          const doc = querySnapshot.docs[0];
+          setExistingReviewId(doc.id);
+          const data = doc.data();
+          setScore(data.score || 5);
+          setSurprise(data.surprise || '');
+          setTastiestFood(data.tastiestFood || '');
+          setTopAttractions(data.topAttractions || []);
+          setAdditionalAttractions(data.additionalAttractions || '');
+          setFreeText(data.freeText || '');
         } else {
           setHasSubmittedToday(false);
+          setExistingReviewId(null);
+          setScore(5);
+          setSurprise('');
+          setTastiestFood('');
+          setTopAttractions([]);
+          setAdditionalAttractions('');
+          setFreeText('');
         }
       } catch (err) {
         console.error("Error checking submissions:", err);
@@ -79,7 +99,7 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
       const year = new Date().getFullYear();
       const reviewDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 
-      await addDoc(collection(db, 'daily_reviews'), {
+      const reviewData = {
         userId: user.uid,
         userName: user.displayName,
         userPhoto: user.photoURL,
@@ -87,21 +107,31 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
         surprise,
         tastiestFood,
         topAttractions,
-        createdAt: serverTimestamp(),
+        additionalAttractions,
+        freeText,
         date: reviewDate
-      });
+      };
+
+      if (existingReviewId) {
+        await updateDoc(doc(db, 'daily_reviews', existingReviewId), {
+          ...reviewData,
+          updatedAt: serverTimestamp()
+        });
+      } else {
+        await addDoc(collection(db, 'daily_reviews'), {
+          ...reviewData,
+          createdAt: serverTimestamp()
+        });
+      }
 
       setSubmitted(true);
       setHasSubmittedToday(true);
+      setIsEditing(false);
       setTimeout(() => {
         setSubmitted(false);
-        setScore(5);
-        setSurprise('');
-        setTastiestFood('');
-        setTopAttractions([]);
       }, 3000);
     } catch (err) {
-      console.error("Error adding document: ", err);
+      console.error("Error saving document: ", err);
       setError("אירעה שגיאה בשמירת הסיכום. אנא נסה שוב.");
     } finally {
       setIsSubmitting(false);
@@ -133,18 +163,56 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
     );
   }
 
-  if (hasSubmittedToday && !submitted) {
+  if (hasSubmittedToday && !submitted && !isEditing) {
     return (
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10 text-center mt-10">
+        {/* Day Selector (Horizontal Scroll) */}
+        <div className="flex gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar px-2" dir="ltr">
+          {ITINERARY.map((day, i) => (
+            <button
+              key={i}
+              onClick={() => setSelectedDay(i)}
+              className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-20 rounded-2xl transition-all ${
+                selectedDay === i ? `${day.color} text-white shadow-md transform scale-105` : 'bg-white text-gray-500 shadow-sm'
+              }`}
+            >
+              <span className="text-xs font-medium mb-1">יום {day.day}</span>
+              <span className={`text-lg font-bold ${selectedDay === i ? 'text-white' : 'text-gray-800'}`}>{day.date}</span>
+            </button>
+          ))}
+        </div>
+
         <div className="text-6xl mb-6">✅</div>
         <h2 className="text-2xl font-light text-gray-800 mb-4">כבר הגשת סיכום ליום זה!</h2>
-        <p className="text-gray-500">תודה ששיתפת. נתראה מחר! 🌙</p>
+        <p className="text-gray-500 mb-6">תודה ששיתפת. נתראה מחר! 🌙</p>
+        <button
+          onClick={() => setIsEditing(true)}
+          className="bg-white border border-gray-200 text-gray-700 font-medium py-3 px-8 rounded-full shadow-sm hover:bg-gray-50 transition-colors mx-auto"
+        >
+          ערוך סיכום
+        </button>
       </div>
     );
   }
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      {/* Day Selector (Horizontal Scroll) */}
+      <div className="flex gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar px-2" dir="ltr">
+        {ITINERARY.map((day, i) => (
+          <button
+            key={i}
+            onClick={() => setSelectedDay(i)}
+            className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-20 rounded-2xl transition-all ${
+              selectedDay === i ? `${day.color} text-white shadow-md transform scale-105` : 'bg-white text-gray-500 shadow-sm'
+            }`}
+          >
+            <span className="text-xs font-medium mb-1">יום {day.day}</span>
+            <span className={`text-lg font-bold ${selectedDay === i ? 'text-white' : 'text-gray-800'}`}>{day.date}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm">📝</div>
         <div>
@@ -251,6 +319,32 @@ export default function DailyReviewTab({ user, handleLogin, selectedDay }) {
             <div className="text-left mt-2 text-xs text-gray-400">
               נבחרו {topAttractions.length} מתוך 3
             </div>
+            
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                אטרקציות נוספות שלא ברשימה:
+              </label>
+              <input
+                type="text"
+                value={additionalAttractions}
+                onChange={(e) => setAdditionalAttractions(e.target.value)}
+                placeholder="הוסף אטרקציות נוספות..."
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#D34A3E]/50 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Free Text */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50">
+            <label className="block text-lg font-medium text-gray-800 mb-3">
+              מה עוד תרצה להגיד על היום? 💭
+            </label>
+            <textarea
+              value={freeText}
+              onChange={(e) => setFreeText(e.target.value)}
+              placeholder="מחשבות, חוויות, או כל דבר אחר..."
+              className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#D34A3E]/50 focus:border-transparent resize-none h-24"
+            />
           </div>
 
 
