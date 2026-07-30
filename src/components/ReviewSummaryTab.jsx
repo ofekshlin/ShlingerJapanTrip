@@ -3,7 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase.js';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
-export default function ReviewSummaryTab({ user, handleLogin }) {
+import { ITINERARY } from '../itinerary-data.js';
+
+export default function ReviewSummaryTab({ user, handleLogin, selectedDay }) {
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,14 +18,19 @@ export default function ReviewSummaryTab({ user, handleLogin }) {
       }
 
       try {
-        // Get yesterday's date in YYYY-MM-DD format
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        const dayData = ITINERARY[selectedDay];
+        if (!dayData) {
+          setIsLoading(false);
+          return;
+        }
+
+        const [day, month] = dayData.date.split('.');
+        const year = new Date().getFullYear();
+        const reviewDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 
         const q = query(
           collection(db, 'daily_reviews'),
-          where('date', '==', yesterdayStr)
+          where('date', '==', reviewDate)
         );
 
         const querySnapshot = await getDocs(q);
@@ -42,7 +49,7 @@ export default function ReviewSummaryTab({ user, handleLogin }) {
     };
 
     fetchYesterdayReviews();
-  }, [user]);
+  }, [user, selectedDay]);
 
   if (isLoading) {
     return (
@@ -57,7 +64,7 @@ export default function ReviewSummaryTab({ user, handleLogin }) {
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10 text-center mt-10">
         <div className="text-6xl mb-6">🔒</div>
         <h2 className="text-2xl font-light text-gray-800 mb-4">יש להתחבר כדי לראות סיכומים</h2>
-        <p className="text-gray-500 mb-8">התחבר עם חשבון גוגל כדי לראות את סיכומי האתמול</p>
+        <p className="text-gray-500 mb-8">התחבר עם חשבון גוגל כדי לראות את הסיכומים</p>
         <button
           onClick={handleLogin}
           className="bg-white border border-gray-200 text-gray-700 font-medium py-3 px-8 rounded-full shadow-sm hover:bg-gray-50 transition-colors flex items-center gap-3 mx-auto"
@@ -74,7 +81,7 @@ export default function ReviewSummaryTab({ user, handleLogin }) {
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm">📊</div>
         <div>
-          <h2 className="text-3xl font-light text-gray-800">סיכומי אתמול</h2>
+          <h2 className="text-3xl font-light text-gray-800">סיכומים - יום {selectedDay + 1}</h2>
           <p className="text-gray-500 text-sm">מה כולם חשבו על היום שהיה</p>
         </div>
       </div>
@@ -88,8 +95,8 @@ export default function ReviewSummaryTab({ user, handleLogin }) {
       {reviews.length === 0 && !error ? (
         <div className="bg-white rounded-3xl p-8 text-center shadow-sm border border-gray-50">
           <div className="text-4xl mb-4">📭</div>
-          <h3 className="text-xl font-medium text-gray-800 mb-2">אין סיכומים מאתמול</h3>
-          <p className="text-gray-500">אף אחד לא הגיש סיכום אתמול.</p>
+          <h3 className="text-xl font-medium text-gray-800 mb-2">אין סיכומים ליום זה</h3>
+          <p className="text-gray-500">אף אחד לא הגיש סיכום ליום זה.</p>
         </div>
       ) : (
         <div className="space-y-6">
