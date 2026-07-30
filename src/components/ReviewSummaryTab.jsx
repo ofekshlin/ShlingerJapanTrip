@@ -5,7 +5,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 
 import { ITINERARY } from '../itinerary-data.js';
 
-export default function ReviewSummaryTab({ user, handleLogin, selectedDay }) {
+export default function ReviewSummaryTab({ user, handleLogin, selectedDay, setSelectedDay }) {
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -78,6 +78,22 @@ export default function ReviewSummaryTab({ user, handleLogin, selectedDay }) {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      {/* Day Selector (Horizontal Scroll) */}
+      <div className="flex gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar px-2" dir="ltr">
+        {ITINERARY.map((day, i) => (
+          <button
+            key={i}
+            onClick={() => setSelectedDay(i)}
+            className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-20 rounded-2xl transition-all ${
+              selectedDay === i ? `${day.color} text-white shadow-md transform scale-105` : 'bg-white text-gray-500 shadow-sm'
+            }`}
+          >
+            <span className="text-xs font-medium mb-1">יום {day.day}</span>
+            <span className={`text-lg font-bold ${selectedDay === i ? 'text-white' : 'text-gray-800'}`}>{day.date}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm">📊</div>
         <div>
