@@ -78,13 +78,30 @@ export default function UploadMediaTab({ user }) {
         const file = item.file;
         addLog(`Preparing to upload: ${file.name}`);
         const storageRef = ref(storage, `media/${user.uid}/${Date.now()}_${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        addLog(`Awaiting uploadTask for ${file.name}...`);
         
-        addLog(`Starting uploadBytes for ${file.name}...`);
-        const snapshot = await uploadBytes(storageRef, file);
-        addLog(`Upload finished for ${file.name}.`);
+        await new Promise((resolve, reject) => {
+          uploadTask.on('state_changed', 
+            (snapshot) => {
+              const p = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              setProgress(prev => ({ ...prev, [item.id]: p }));
+              addLog(`Progress ${file.name}: ${p.toFixed(1)}% (${snapshot.state})`);
+            },
+            (error) => {
+              addLog(`Upload error for ${file.name}: ${error.code} - ${error.message}`);
+              reject(error);
+            },
+            () => {
+              addLog(`UploadTask finished for ${file.name}.`);
+              resolve();
+            }
+          );
+        });
 
         addLog(`Getting download URL for ${file.name}...`);
-        const downloadURL = await getDownloadURL(snapshot.ref);
+        const downloadURL = await getDownloadURL(storageRef);
         addLog(`Got download URL for ${file.name}: ${downloadURL}`);
         
         // Save to Firestore
