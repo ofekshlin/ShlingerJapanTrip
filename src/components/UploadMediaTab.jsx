@@ -71,40 +71,32 @@ export default function UploadMediaTab({ user }) {
         const storageRef = ref(storage, `media/${user.uid}/${Date.now()}_${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
 
-        await new Promise((resolve, reject) => {
-          uploadTask.on('state_changed', 
-            (snapshot) => {
-              const p = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setProgress(prev => ({ ...prev, [item.id]: p }));
-            },
-            (error) => reject(error),
-            async () => {
-              try {
-                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                
-                // Save to Firestore
-                await addDoc(collection(db, 'media'), {
-                  url: downloadURL,
-                  type: item.type,
-                  uploaderId: user.uid,
-                  uploaderName: user.displayName || 'Unknown',
-                  uploaderPhoto: user.photoURL || null,
-                  uploadedAt: serverTimestamp(),
-                  originalDate: item.metadata.date || null,
-                  location: (item.metadata.latitude && item.metadata.longitude) ? {
-                    lat: item.metadata.latitude,
-                    lng: item.metadata.longitude
-                  } : null,
-                  likes: [],
-                  isTopImage: false,
-                  day: null // Can be assigned later based on date or manually
-                });
-                resolve();
-              } catch (err) {
-                reject(err);
-              }
-            }
-          );
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            const p = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setProgress(prev => ({ ...prev, [item.id]: p }));
+          }
+        );
+
+        await uploadTask;
+        const downloadURL = await getDownloadURL(storageRef);
+        
+        // Save to Firestore
+        await addDoc(collection(db, 'media'), {
+          url: downloadURL,
+          type: item.type,
+          uploaderId: user.uid,
+          uploaderName: user.displayName || 'Unknown',
+          uploaderPhoto: user.photoURL || null,
+          uploadedAt: serverTimestamp(),
+          originalDate: item.metadata.date || null,
+          location: (item.metadata.latitude && item.metadata.longitude) ? {
+            lat: item.metadata.latitude,
+            lng: item.metadata.longitude
+          } : null,
+          likes: [],
+          isTopImage: false,
+          day: null // Can be assigned later based on date or manually
         });
       }
       
