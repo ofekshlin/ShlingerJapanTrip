@@ -12,7 +12,13 @@ export default function UploadMediaTab({ user }) {
   const [progress, setProgress] = useState({});
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [logs, setLogs] = useState([]);
   const fileInputRef = useRef(null);
+
+  const addLog = (msg) => {
+    console.log(msg);
+    setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${msg}`]);
+  };
 
   const handleFileSelect = async (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -64,10 +70,13 @@ export default function UploadMediaTab({ user }) {
     setUploading(true);
     setError(null);
     setSuccess(false);
+    setLogs([]);
+    addLog(`Starting upload for ${files.length} files...`);
 
     try {
       for (const item of files) {
         const file = item.file;
+        addLog(`Preparing to upload: ${file.name}`);
         const storageRef = ref(storage, `media/${user.uid}/${Date.now()}_${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -75,13 +84,20 @@ export default function UploadMediaTab({ user }) {
           (snapshot) => {
             const p = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             setProgress(prev => ({ ...prev, [item.id]: p }));
+          },
+          (error) => {
+            addLog(`Upload error for ${file.name}: ${error.message}`);
           }
         );
 
+        addLog(`Awaiting uploadTask for ${file.name}...`);
         await uploadTask;
+        addLog(`UploadTask finished for ${file.name}. Getting download URL...`);
         const downloadURL = await getDownloadURL(storageRef);
+        addLog(`Got download URL for ${file.name}: ${downloadURL}`);
         
         // Save to Firestore
+        addLog(`Saving metadata to Firestore for ${file.name}...`);
         await addDoc(collection(db, 'media'), {
           url: downloadURL,
           type: item.type,
@@ -98,16 +114,20 @@ export default function UploadMediaTab({ user }) {
           isTopImage: false,
           day: null // Can be assigned later based on date or manually
         });
+        addLog(`Successfully saved metadata for ${file.name}.`);
       }
       
+      addLog('All files uploaded successfully!');
       setSuccess(true);
       setFiles([]);
       setProgress({});
     } catch (err) {
+      addLog(`Caught error in handleUpload: ${err.message}`);
       console.error('Upload error:', err);
-      setError('אירעה שגיאה בהעלאת הקבצים. אנא נסה שוב.');
+      setError(`אירעה שגיאה בהעלאת הקבצים: ${err.message}`);
     } finally {
       setUploading(false);
+      addLog('Upload process finished.');
     }
   };
 
@@ -212,6 +232,15 @@ export default function UploadMediaTab({ user }) {
               </>
             )}
           </button>
+        </div>
+      )}
+
+      {logs.length > 0 && (
+        <div className="bg-gray-900 text-green-400 p-4 rounded-xl mt-6 font-mono text-xs overflow-y-auto max-h-64 text-left" dir="ltr">
+          <h4 className="text-white mb-2 font-bold">Upload Logs:</h4>
+          {logs.map((log, i) => (
+            <div key={i} className="mb-1">{log}</div>
+          ))}
         </div>
       )}
     </div>
