@@ -11,6 +11,10 @@ import { auth, googleProvider } from './firebase.js';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import DailyReviewTab from './components/DailyReviewTab.jsx';
 import ReviewSummaryTab from './components/ReviewSummaryTab.jsx';
+import TopMenu from './components/TopMenu.jsx';
+import { DictionaryTab, ContactsTab } from './components/MorePages.jsx';
+import PicturesTab from './components/PicturesTab.jsx';
+import UploadMediaTab from './components/UploadMediaTab.jsx';
 
 // Your live Google My Maps (740 places, colored by category)
 const MY_MAPS_ID = '1I0o12hoecmBorcEsinQqw4nhTDG7adU';
@@ -28,7 +32,7 @@ const ICONS = {
   shop: <ShoppingBag size={16} />,
 };
 
-const TRIP_DATA = {
+export const TRIP_DATA = {
   // Flight departs TLV on 25.7 (overnight), lands Tokyo 26.7. Itinerary day 1 = 26.7.
   startDate: new Date('2026-07-25T19:45:00'),
   landingDate: new Date('2026-07-26T15:35:00'),
@@ -119,9 +123,12 @@ export default function JapanTripApp() {
 
       {/* Header */}
       <header className="pt-10 pb-4 px-6 z-10 bg-[#FDF8EE]/90 backdrop-blur-sm sticky top-0 flex justify-between items-center">
-        <h1 className="text-xl font-light tracking-wide text-gray-600 flex items-center gap-2">
-          <span className="text-[#D34A3E]">⛩️</span> יפן 2026
-        </h1>
+        <div className="flex items-center gap-3">
+          <TopMenu setActiveTab={setActiveTab} user={user} handleLogin={handleLogin} />
+          <h1 className="text-xl font-light tracking-wide text-gray-600 flex items-center gap-2">
+            <span className="text-[#D34A3E]">⛩️</span> יפן 2026
+          </h1>
+        </div>
         <div>
           {user ? (
             <div className="flex items-center gap-2">
@@ -147,12 +154,15 @@ export default function JapanTripApp() {
         {activeTab === 'itinerary' && <ItineraryTab selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
         {activeTab === 'review' && <DailyReviewTab user={user} handleLogin={handleLogin} selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
         {activeTab === 'summary' && <ReviewSummaryTab user={user} handleLogin={handleLogin} selectedDay={selectedDay} setSelectedDay={setSelectedDay} />}
-        {activeTab === 'more' && <MoreTab speakJapanese={speakJapanese} />}
+        {activeTab === 'dictionary' && <DictionaryTab speakJapanese={speakJapanese} dictionary={TRIP_DATA.dictionary} />}
+        {activeTab === 'contacts' && <ContactsTab contacts={TRIP_DATA.contacts} />}
+        {activeTab === 'upload' && <UploadMediaTab user={user} />}
+        {activeTab === 'pictures' && <PicturesTab user={user} handleLogin={handleLogin} />}
       </main>
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-100 flex justify-between px-2 py-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-x-auto">
-        <NavButton id="more" icon={<Menu size={22} />} label="עוד" active={activeTab} set={setActiveTab} />
+        <NavButton id="pictures" icon={<Camera size={22} />} label="תמונות" active={activeTab} set={setActiveTab} />
         <NavButton id="summary" icon={<span className="text-xl leading-none">📊</span>} label="סיכומים" active={activeTab} set={setActiveTab} />
         <NavButton id="review" icon={<Star size={22} />} label="סיכום" active={activeTab} set={setActiveTab} />
         <NavButton id="places" icon={<Compass size={22} />} label="מה עושים?" active={activeTab} set={setActiveTab} />
@@ -511,87 +521,6 @@ function ItineraryTab({ selectedDay, setSelectedDay }) {
   );
 }
 
-function MoreTab({ speakJapanese }) {
-  return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-
-      {/* Flights Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-medium text-gray-700 mb-4 px-2">טיסות ✈️</h3>
-
-        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-50 mb-3 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-full h-1 bg-pink-400"></div>
-          <div className="flex justify-between items-center mb-4">
-            <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded font-medium">שולם</span>
-            <Plane className="text-blue-500 transform -rotate-45" size={20} />
-          </div>
-          <div className="flex justify-between items-center text-center relative">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 border-b-2 border-dashed border-gray-300"></div>
-            <Plane className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-400 bg-white px-1" size={16} />
-
-            <div>
-              <h4 className="text-3xl font-light text-gray-800">TLV</h4>
-              <p className="text-gray-500 text-xs">Tel Aviv</p>
-            </div>
-            <div>
-              <h4 className="text-3xl font-light text-gray-800">NRT</h4>
-              <p className="text-gray-500 text-xs">Tokyo</p>
-            </div>
-          </div>
-          <div className="mt-4 text-center space-y-1">
-            <p className="text-gray-600 text-sm">המראה: 25.07.26 • 19:45</p>
-            <p className="text-gray-400 text-xs">נחיתה בטוקיו: 26.07.26 • 15:35</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Dictionary Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-medium text-gray-700 mb-2 px-2 flex items-center justify-between">
-          <span>שיחון 🗣️</span>
-          <span className="text-xs text-gray-400 font-normal">מילים שיצילו את היום</span>
-        </h3>
-
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden">
-          {TRIP_DATA.dictionary.map((item, i) => (
-            <div key={i} className={`flex items-center justify-between p-4 ${i !== TRIP_DATA.dictionary.length - 1 ? 'border-b border-gray-100' : ''} ${i % 2 === 0 ? 'bg-[#F4F8FA]' : 'bg-white'}`}>
-              <button
-                onClick={() => speakJapanese(item.ja)}
-                className="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-colors"
-              >
-                <Volume2 size={18} />
-              </button>
-              <div className="text-right flex-1 pr-4">
-                <p className="font-medium text-gray-800">{item.he}</p>
-                <p className="text-sm text-gray-500" dir="ltr">{item.ja}</p>
-                <p className="text-xs text-gray-400">{item.kana}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Contacts Section */}
-      <div>
-        <h3 className="text-xl font-medium text-gray-700 mb-2 px-2">אנשי קשר חשובים 📞</h3>
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden p-2">
-          {TRIP_DATA.contacts.map((contact, i) => (
-            <div key={i} className="flex justify-between items-center p-3 border-b border-gray-50 last:border-0">
-              <a href={`tel:${contact.phone}`} className="bg-green-50 text-green-600 p-2 rounded-xl">
-                <Phone size={18} />
-              </a>
-              <div className="text-right">
-                <p className="font-medium text-gray-800">{contact.name}</p>
-                <p className="text-sm text-gray-500" dir="ltr">{contact.phone}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-    </div>
-  );
-}
 
 // --- UTILS ---
 
