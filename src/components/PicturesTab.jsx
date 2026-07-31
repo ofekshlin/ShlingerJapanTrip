@@ -83,12 +83,30 @@ export default function PicturesTab({ user, handleLogin }) {
     }
 
     try {
-      const urls = itemsToShare.map(item => item.url).join('\n');
-      await navigator.share({
-        title: 'תמונות מיפן',
-        text: 'תראו את התמונות האלה מיפן!',
-        url: urls
-      });
+      const files = [];
+      for (const item of itemsToShare) {
+        if (item.type === 'image') {
+          const response = await fetch(item.url);
+          const blob = await response.blob();
+          const file = new File([blob], `image_${item.id}.jpg`, { type: blob.type });
+          files.push(file);
+        }
+      }
+
+      if (files.length > 0 && navigator.canShare && navigator.canShare({ files })) {
+        await navigator.share({
+          title: 'תמונות מיפן',
+          text: 'תראו את התמונות האלה מיפן!',
+          files: files
+        });
+      } else {
+        const urls = itemsToShare.map(item => item.url).join('\n');
+        await navigator.share({
+          title: 'תמונות מיפן',
+          text: 'תראו את התמונות האלה מיפן!',
+          url: urls
+        });
+      }
     } catch (error) {
       console.error('Error sharing:', error);
     }
@@ -173,6 +191,9 @@ export default function PicturesTab({ user, handleLogin }) {
     const topMedia = [...dailyMedia].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
 
     const mediaWithLocation = dailyMedia.filter(m => m.location);
+    const mapCenter = mediaWithLocation.length > 0 
+      ? [mediaWithLocation[0].location.lat, mediaWithLocation[0].location.lng]
+      : [35.6762, 139.6503]; // Default to Tokyo
 
     return (
       <div className="space-y-6">
@@ -194,19 +215,18 @@ export default function PicturesTab({ user, handleLogin }) {
         </div>
 
         {/* Map View */}
-        {mediaWithLocation.length > 0 && (
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden">
-            <div className="p-4 border-b border-gray-50 flex items-center gap-2">
-              <MapIcon size={18} className="text-blue-500" />
-              <h3 className="font-medium text-gray-700">מפת תמונות</h3>
-            </div>
-            <div className="h-48 w-full z-0 relative">
-              <MapContainer 
-                center={[mediaWithLocation[0].location.lat, mediaWithLocation[0].location.lng]} 
-                zoom={13} 
-                style={{ height: '100%', width: '100%' }}
-                zoomControl={false}
-              >
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden">
+          <div className="p-4 border-b border-gray-50 flex items-center gap-2">
+            <MapIcon size={18} className="text-blue-500" />
+            <h3 className="font-medium text-gray-700">מפת תמונות</h3>
+          </div>
+          <div className="h-48 w-full z-0 relative">
+            <MapContainer
+              center={mapCenter}
+              zoom={mediaWithLocation.length > 0 ? 13 : 5}
+              style={{ height: '100%', width: '100%' }}
+              zoomControl={false}
+            >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {mediaWithLocation.map(item => (
                   <Marker key={item.id} position={[item.location.lat, item.location.lng]}>
@@ -222,9 +242,8 @@ export default function PicturesTab({ user, handleLogin }) {
                   </Marker>
                 ))}
               </MapContainer>
-            </div>
           </div>
-        )}
+        </div>
 
         {/* Top Images */}
         <div>
@@ -234,15 +253,18 @@ export default function PicturesTab({ user, handleLogin }) {
               התמונות המובילות
             </h3>
             {user && (
-              <button className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium">
-                פרסם סיכום יומי
+              <button 
+                onClick={() => handleShare(topMedia)}
+                className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium"
+              >
+                שתף סיכום יומי
               </button>
             )}
           </div>
-          
+
           {topMedia.length > 0 ? (
-            <div className="space-y-4">
-              {topMedia.map(item => renderMediaItem(item))}
+            <div className="grid grid-cols-2 gap-2">
+              {topMedia.map(item => renderMediaItem(item, true))}
             </div>
           ) : (
             <div className="text-center py-10 bg-white rounded-3xl border border-gray-50">
