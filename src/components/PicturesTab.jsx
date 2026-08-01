@@ -232,34 +232,6 @@ export default function PicturesTab({ user, handleLogin }) {
         </div>
 
 
-        {/* Top Images */}
-        <div>
-          <div className="flex items-center justify-between mb-4 px-2">
-            <h3 className="font-medium text-gray-700 flex items-center gap-2">
-              <Heart size={18} className="text-red-500" />
-              התמונות המובילות
-            </h3>
-            {user && (
-              <button 
-                onClick={() => handleShare(topMedia.slice(0, 4))}
-                className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium"
-              >
-                שתף סיכום יומי
-              </button>
-            )}
-          </div>
-
-          {topMedia.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
-              {topMedia.slice(0, 4).map(item => renderMediaItem(item, true))}
-            </div>
-          ) : (
-            <div className="text-center py-10 bg-white rounded-3xl border border-gray-50">
-              <p className="text-gray-500">אין תמונות ליום זה עדיין</p>
-            </div>
-          )}
-        </div>
-
         {/* Map View */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden mt-6">
           <div className="p-4 border-b border-gray-50 flex items-center gap-2">
@@ -289,6 +261,35 @@ export default function PicturesTab({ user, handleLogin }) {
                 ))}
               </MapContainer>
           </div>
+        </div>
+
+
+        {/* Top Images */}
+        <div>
+          <div className="flex items-center justify-between mb-4 px-2">
+            <h3 className="font-medium text-gray-700 flex items-center gap-2">
+              <Heart size={18} className="text-red-500" />
+              התמונות המובילות
+            </h3>
+            {user && (
+              <button 
+                onClick={() => handleShare(topMedia.slice(0, 4))}
+                className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium"
+              >
+                שתף סיכום יומי
+              </button>
+            )}
+          </div>
+
+          {topMedia.length > 0 ? (
+            <div className="grid grid-cols-2 gap-2">
+              {topMedia.slice(0, 4).map(item => renderMediaItem(item, true))}
+            </div>
+          ) : (
+            <div className="text-center py-10 bg-white rounded-3xl border border-gray-50">
+              <p className="text-gray-500">אין תמונות ליום זה עדיין</p>
+            </div>
+          )}
         </div>
 
       </div>
