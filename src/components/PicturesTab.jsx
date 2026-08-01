@@ -379,6 +379,13 @@ export default function PicturesTab({ user, handleLogin }) {
               <X size={24} />
             </button>
             <div className="flex items-center gap-4">
+                <button
+                  onClick={() => handleDownload(lightboxItem)}
+                  className="p-2 text-white/80 hover:text-white bg-black/20 rounded-full backdrop-blur-sm"
+                >
+                  <Download size={20} />
+                </button>
+
               <button 
                 onClick={() => handleShare([lightboxItem])}
                 className="p-2 text-white/80 hover:text-white bg-black/20 rounded-full backdrop-blur-sm"
