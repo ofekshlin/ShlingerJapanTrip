@@ -17,12 +17,18 @@ L.Icon.Default.mergeOptions({
 
 export default function PicturesTab({ user, handleLogin }) {
   const [view, setView] = useState('daily'); // 'daily' or 'gallery'
-  const [media, setMedia] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedDay, setSelectedDay] = useState(1);
-  const [lightboxItem, setLightboxItem] = useState(null);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const [media, setMedia] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedDay, setSelectedDay] = useState(1);
+    const [lightboxItem, setLightboxItem] = useState(null);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const [notification, setNotification] = useState(null);
+
+    const showNotification = (message, type = 'info') => {
+      setNotification({ message, type });
+      setTimeout(() => setNotification(null), 3000);
+    };
 
   useEffect(() => {
     const q = query(collection(db, 'media'), orderBy('uploadedAt', 'desc'));
@@ -103,10 +109,11 @@ export default function PicturesTab({ user, handleLogin }) {
 
     const handleShare = async (itemsToShare) => {
       if (!navigator.share) {
-        alert('שיתוף לא נתמך בדפדפן זה');
+        showNotification('שיתוף לא נתמך בדפדפן זה', 'error');
         return;
       }
 
+      showNotification('מכין תמונות לשיתוף...', 'info');
       try {
         const files = [];
         let fetchFailed = false;
@@ -129,19 +136,25 @@ export default function PicturesTab({ user, handleLogin }) {
             text: 'תראו את התמונות האלה מיפן!',
             files: files
           });
+          showNotification('שותף בהצלחה!', 'success');
         } else {
           const urls = itemsToShare.map(item => item.url).join('\n');
           await navigator.share({
             title: 'תמונות מיפן',
             text: 'תראו את התמונות האלה מיפן!\n' + urls
           });
+          showNotification('שותף בהצלחה (קישורים)!', 'success');
         }
       } catch (error) {
         console.error('Error sharing:', error);
+        if (error.name !== 'AbortError') {
+            showNotification('שגיאה בשיתוף', 'error');
+        }
       }
     };
 
     const handleDownload = async (item) => {
+      showNotification('מוריד תמונה...', 'info');
       try {
         const blob = await fetchImageBlob(item.url);
         const url = window.URL.createObjectURL(blob);
@@ -153,8 +166,10 @@ export default function PicturesTab({ user, handleLogin }) {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+        showNotification('הורד בהצלחה!', 'success');
       } catch (error) {
         console.error('Error downloading, falling back to open in new tab:', error);
+        showNotification('פותח תמונה בכרטיסייה חדשה...', 'info');
         const a = document.createElement('a');
         a.href = item.url;
         a.download = `image_${item.id}.${item.type === 'image' ? 'jpg' : 'mp4'}`;
@@ -268,66 +283,64 @@ export default function PicturesTab({ user, handleLogin }) {
         </div>
 
 
-        {/* Map View */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden mt-6">
-          <div className="p-4 border-b border-gray-50 flex items-center gap-2">
-            <MapIcon size={18} className="text-blue-500" />
-            <h3 className="font-medium text-gray-700">מפת תמונות</h3>
-          </div>
-          <div className="h-48 w-full z-0 relative">
-            <MapContainer
-              center={mapCenter}
-              zoom={mediaWithLocation.length > 0 ? 13 : 5}
-              style={{ height: '100%', width: '100%' }}
-              zoomControl={false}
-            >
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {mediaWithLocation.map(item => (
-                  <Marker key={item.id} position={[item.location.lat, item.location.lng]}>
-                    <Popup>
-                      <div className="w-24 h-24">
-                        {item.type === 'image' ? (
-                          <img src={item.url} className="w-full h-full object-cover rounded-lg" />
-                        ) : (
-                          <video src={item.url} className="w-full h-full object-cover rounded-lg" />
-                        )}
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
-          </div>
-        </div>
+          {/* Top Images */}
+          <div>
+            <div className="flex items-center justify-between mb-4 px-2">
+              <h3 className="font-medium text-gray-700 flex items-center gap-2">
+                <Heart size={18} className="text-red-500" />
+                התמונות המובילות
+              </h3>
+              {user && (
+                <button
+                  onClick={() => handleShare(topMedia.slice(0, 4))}
+                  className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium"
+                >
+                  שתף סיכום יומי
+                </button>
+              )}
+            </div>
 
-
-        {/* Top Images */}
-        <div>
-          <div className="flex items-center justify-between mb-4 px-2">
-            <h3 className="font-medium text-gray-700 flex items-center gap-2">
-              <Heart size={18} className="text-red-500" />
-              התמונות המובילות
-            </h3>
-            {user && (
-              <button 
-                onClick={() => handleShare(topMedia.slice(0, 4))}
-                className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium"
-              >
-                שתף סיכום יומי
-              </button>
+            {topMedia.length > 0 ? (
+              <div className="grid grid-cols-2 gap-2">
+                {topMedia.slice(0, 4).map(item => renderMediaItem(item, true))}
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-white rounded-3xl border border-gray-50">
+                <p className="text-gray-500">אין תמונות ליום זה עדיין</p>
+              </div>
             )}
           </div>
 
-          {topMedia.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
-              {topMedia.slice(0, 4).map(item => renderMediaItem(item, true))}
+          {/* Map View */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden mt-6">
+            <div className="p-4 border-b border-gray-50 flex items-center gap-2">
+              <MapIcon size={18} className="text-blue-500" />
+              <h3 className="font-medium text-gray-700">מפת תמונות</h3>
             </div>
-          ) : (
-            <div className="text-center py-10 bg-white rounded-3xl border border-gray-50">
-              <p className="text-gray-500">אין תמונות ליום זה עדיין</p>
+            <div className="h-48 w-full z-0 relative">
+              <MapContainer
+                center={mapCenter}
+                zoom={mediaWithLocation.length > 0 ? 13 : 5}
+                style={{ height: '100%', width: '100%' }}
+                zoomControl={false}
+              >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  {mediaWithLocation.map(item => (
+                    <Marker key={item.id} position={[item.location.lat, item.location.lng]}>
+                      <Popup>
+                        <div className="w-24 h-24">
+                          {item.type === 'image' ? (
+                            <img src={item.url} className="w-full h-full object-cover rounded-lg" />
+                          ) : (
+                            <video src={item.url} className="w-full h-full object-cover rounded-lg" />
+                          )}
+                        </div>
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MapContainer>
             </div>
-          )}
-        </div>
-
+          </div>
       </div>
     );
   };
@@ -364,38 +377,48 @@ export default function PicturesTab({ user, handleLogin }) {
     );
   };
 
-  return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-      {/* View Toggle */}
-      <div className="flex bg-gray-100 p-1 rounded-2xl mb-6">
-        <button
-          onClick={() => setView('daily')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-            view === 'daily' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          <MapIcon size={16} />
-          סיכום יומי
-        </button>
-        <button
-          onClick={() => setView('gallery')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-            view === 'gallery' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          <Grid size={16} />
-          גלריה מלאה
-        </button>
-      </div>
+      return (
+        <div className="pb-24">
+          {/* Notification Toast */}
+          {notification && (
+            <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[200] px-4 py-2 rounded-full shadow-lg text-sm font-medium transition-all duration-300 ${
+              notification.type === 'error' ? 'bg-red-500 text-white' :
+              notification.type === 'success' ? 'bg-green-500 text-white' :
+              'bg-blue-500 text-white'
+            }`}>
+              {notification.message}
+            </div>
+          )}
 
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-        </div>
-      ) : (
-        view === 'daily' ? renderDailyView() : renderGalleryView()
-      )}
+          {/* Header */}
+          <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
+            <button
+              onClick={() => setView('daily')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                view === 'daily' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'
+              }`}
+            >
+              סיכום יומי
+            </button>
+            <button
+              onClick={() => setView('gallery')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                view === 'gallery' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'
+              }`}
+            >
+              גלריה מלאה
+            </button>
+          </div>
 
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            view === 'daily' ? renderDailyView() : renderGalleryView()
+          )}
+
+          {/* Lightbox */}
       {/* Lightbox */}
       {lightboxItem && (
         <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-in fade-in duration-200">
