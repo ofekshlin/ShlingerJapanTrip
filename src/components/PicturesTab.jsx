@@ -78,15 +78,26 @@ export default function PicturesTab({ user, handleLogin }) {
 
     const fetchImageBlob = async (url) => {
       try {
-        const response = await fetch(url, { cache: 'no-cache' });
+        // Try fetching directly first
+        const response = await fetch(url, { mode: 'cors' });
         if (!response.ok) throw new Error('Network response was not ok');
         return await response.blob();
       } catch (e) {
         console.log('Direct fetch failed, trying proxy...', e);
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const response = await fetch(proxyUrl);
-        if (!response.ok) throw new Error('Proxy fetch failed');
-        return await response.blob();
+        try {
+            // Try with a proxy that adds CORS headers
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+            const response = await fetch(proxyUrl);
+            if (!response.ok) throw new Error('Proxy fetch failed');
+            return await response.blob();
+        } catch (e2) {
+            console.log('First proxy failed, trying second proxy...', e2);
+            // Try another proxy
+            const proxyUrl2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+            const response = await fetch(proxyUrl2);
+            if (!response.ok) throw new Error('Second proxy fetch failed');
+            return await response.blob();
+        }
       }
     };
 
@@ -153,7 +164,6 @@ export default function PicturesTab({ user, handleLogin }) {
         document.body.removeChild(a);
       }
     };
-
 
   const renderMediaItem = (item, isGallery = false) => {
     const isSelected = selectedItems.includes(item.id);
