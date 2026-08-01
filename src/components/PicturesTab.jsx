@@ -211,7 +211,7 @@ export default function PicturesTab({ user, handleLogin }) {
   const renderDailyView = () => {
     // Filter media for the selected day (for now, just mock it or use all if day is not set)
     // In a real app, we'd filter by item.day === selectedDay or by date range
-    const dailyMedia = media.filter(m => m.day === selectedDay || !m.day); // Fallback for unassigned
+    const dailyMedia = media.filter(m => m.day === selectedDay); // Filter by selected day
     
     // Sort by likes for "Top Images"
     const topMedia = [...dailyMedia].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
