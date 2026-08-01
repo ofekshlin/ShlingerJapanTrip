@@ -76,57 +76,64 @@ export default function PicturesTab({ user, handleLogin }) {
     toggleSelection(item);
   };
 
-  const handleShare = async (itemsToShare) => {
-    if (!navigator.share) {
-      alert('שיתוף לא נתמך בדפדפן זה');
-      return;
-    }
+    const handleShare = async (itemsToShare) => {
+      if (!navigator.share) {
+        alert('שיתוף לא נתמך בדפדפן זה');
+        return;
+      }
 
-    try {
-      const files = [];
-      for (const item of itemsToShare) {
-        if (item.type === 'image') {
-          const response = await fetch(item.url);
-          const blob = await response.blob();
-          const file = new File([blob], `image_${item.id}.jpg`, { type: blob.type });
-          files.push(file);
+      try {
+        const files = [];
+        let fetchFailed = false;
+        for (const item of itemsToShare) {
+          if (item.type === 'image') {
+            try {
+              const response = await fetch(item.url);
+              const blob = await response.blob();
+              const file = new File([blob], `image_${item.id}.jpg`, { type: blob.type });
+              files.push(file);
+            } catch (e) {
+              console.error('Error fetching image for share:', e);
+              fetchFailed = true;
+            }
+          }
         }
-      }
 
-      if (files.length > 0 && navigator.canShare && navigator.canShare({ files })) {
-        await navigator.share({
-          title: 'תמונות מיפן',
-          text: 'תראו את התמונות האלה מיפן!',
-          files: files
-        });
-      } else {
-        const urls = itemsToShare.map(item => item.url).join('\n');
-        await navigator.share({
-          title: 'תמונות מיפן',
-          text: 'תראו את התמונות האלה מיפן!\n' + urls
-        });
+        if (!fetchFailed && files.length > 0 && navigator.canShare && navigator.canShare({ files })) {
+          await navigator.share({
+            title: 'תמונות מיפן',
+            text: 'תראו את התמונות האלה מיפן!',
+            files: files
+          });
+        } else {
+          const urls = itemsToShare.map(item => item.url).join('\n');
+          await navigator.share({
+            title: 'תמונות מיפן',
+            text: 'תראו את התמונות האלה מיפן!\n' + urls
+          });
+        }
+      } catch (error) {
+        console.error('Error sharing:', error);
       }
-    } catch (error) {
-      console.error('Error sharing:', error);
-    }
-  };
-  const handleDownload = async (item) => {
-    try {
-      const response = await fetch(item.url);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `image_${item.id}.${item.type === 'image' ? 'jpg' : 'mp4'}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Error downloading:', error);
-    }
-  };
+    };
+    const handleDownload = async (item) => {
+      try {
+        const response = await fetch(item.url);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `image_${item.id}.${item.type === 'image' ? 'jpg' : 'mp4'}`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('Error downloading, falling back to open in new tab:', error);
+        window.open(item.url, '_blank');
+      }
+    };
 
 
   const renderMediaItem = (item, isGallery = false) => {
