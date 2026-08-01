@@ -211,7 +211,7 @@ export default function PicturesTab({ user, handleLogin }) {
   const renderDailyView = () => {
     // Filter media for the selected day (for now, just mock it or use all if day is not set)
     // In a real app, we'd filter by item.day === selectedDay or by date range
-    const dailyMedia = media.filter(m => m.day === selectedDay); // Filter by selected day
+    const dailyMedia = media.filter(m => m.day === selectedDay || !m.day); // Filter by selected day
     
     // Sort by likes for "Top Images"
     const topMedia = [...dailyMedia].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
@@ -250,7 +250,7 @@ export default function PicturesTab({ user, handleLogin }) {
             </h3>
             {user && (
               <button 
-                onClick={() => handleShare(topMedia)}
+                onClick={() => handleShare(topMedia.slice(0, 4))}
                 className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium"
               >
                 שתף סיכום יומי
@@ -260,7 +260,7 @@ export default function PicturesTab({ user, handleLogin }) {
 
           {topMedia.length > 0 ? (
             <div className="grid grid-cols-2 gap-2">
-              {topMedia.map(item => renderMediaItem(item, true))}
+              {topMedia.slice(0, 4).map(item => renderMediaItem(item, true))}
             </div>
           ) : (
             <div className="text-center py-10 bg-white rounded-3xl border border-gray-50">
