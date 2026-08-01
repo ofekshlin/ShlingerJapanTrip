@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Heart, Map as MapIcon, Grid, Share2, Maximize2, X, ChevronRight, ChevronLeft, Play } from 'lucide-react';
+import { Heart, Map as MapIcon, Grid, Share2, Maximize2, X, ChevronRight, ChevronLeft, Play, Download } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -103,14 +103,31 @@ export default function PicturesTab({ user, handleLogin }) {
         const urls = itemsToShare.map(item => item.url).join('\n');
         await navigator.share({
           title: 'תמונות מיפן',
-          text: 'תראו את התמונות האלה מיפן!',
-          url: urls
+          text: 'תראו את התמונות האלה מיפן!\n' + urls
         });
       }
     } catch (error) {
       console.error('Error sharing:', error);
     }
   };
+  const handleDownload = async (item) => {
+    try {
+      const response = await fetch(item.url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `image_${item.id}.${item.type === 'image' ? 'jpg' : 'mp4'}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading:', error);
+    }
+  };
+
 
   const renderMediaItem = (item, isGallery = false) => {
     const isSelected = selectedItems.includes(item.id);
@@ -166,6 +183,15 @@ export default function PicturesTab({ user, handleLogin }) {
               <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
             </button>
             {likeCount > 0 && <span className="text-white text-xs font-medium">{likeCount}</span>}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDownload(item);
+              }}
+              className="p-1 rounded-full transition-colors text-white ml-1"
+            >
+              <Download size={16} />
+            </button>
           </div>
         )}
 
@@ -214,8 +240,37 @@ export default function PicturesTab({ user, handleLogin }) {
           </button>
         </div>
 
+
+        {/* Top Images */}
+        <div>
+          <div className="flex items-center justify-between mb-4 px-2">
+            <h3 className="font-medium text-gray-700 flex items-center gap-2">
+              <Heart size={18} className="text-red-500" />
+              התמונות המובילות
+            </h3>
+            {user && (
+              <button 
+                onClick={() => handleShare(topMedia)}
+                className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium"
+              >
+                שתף סיכום יומי
+              </button>
+            )}
+          </div>
+
+          {topMedia.length > 0 ? (
+            <div className="grid grid-cols-2 gap-2">
+              {topMedia.map(item => renderMediaItem(item, true))}
+            </div>
+          ) : (
+            <div className="text-center py-10 bg-white rounded-3xl border border-gray-50">
+              <p className="text-gray-500">אין תמונות ליום זה עדיין</p>
+            </div>
+          )}
+        </div>
+
         {/* Map View */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden mt-6">
           <div className="p-4 border-b border-gray-50 flex items-center gap-2">
             <MapIcon size={18} className="text-blue-500" />
             <h3 className="font-medium text-gray-700">מפת תמונות</h3>
@@ -245,33 +300,6 @@ export default function PicturesTab({ user, handleLogin }) {
           </div>
         </div>
 
-        {/* Top Images */}
-        <div>
-          <div className="flex items-center justify-between mb-4 px-2">
-            <h3 className="font-medium text-gray-700 flex items-center gap-2">
-              <Heart size={18} className="text-red-500" />
-              התמונות המובילות
-            </h3>
-            {user && (
-              <button 
-                onClick={() => handleShare(topMedia)}
-                className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium"
-              >
-                שתף סיכום יומי
-              </button>
-            )}
-          </div>
-
-          {topMedia.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
-              {topMedia.map(item => renderMediaItem(item, true))}
-            </div>
-          ) : (
-            <div className="text-center py-10 bg-white rounded-3xl border border-gray-50">
-              <p className="text-gray-500">אין תמונות ליום זה עדיין</p>
-            </div>
-          )}
-        </div>
       </div>
     );
   };
