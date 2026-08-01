@@ -76,6 +76,20 @@ export default function PicturesTab({ user, handleLogin }) {
     toggleSelection(item);
   };
 
+    const fetchImageBlob = async (url) => {
+      try {
+        const response = await fetch(url, { cache: 'no-cache' });
+        if (!response.ok) throw new Error('Network response was not ok');
+        return await response.blob();
+      } catch (e) {
+        console.log('Direct fetch failed, trying proxy...', e);
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error('Proxy fetch failed');
+        return await response.blob();
+      }
+    };
+
     const handleShare = async (itemsToShare) => {
       if (!navigator.share) {
         alert('שיתוף לא נתמך בדפדפן זה');
@@ -88,9 +102,8 @@ export default function PicturesTab({ user, handleLogin }) {
         for (const item of itemsToShare) {
           if (item.type === 'image') {
             try {
-              const response = await fetch(item.url);
-              const blob = await response.blob();
-              const file = new File([blob], `image_${item.id}.jpg`, { type: blob.type });
+              const blob = await fetchImageBlob(item.url);
+              const file = new File([blob], `image_${item.id}.jpg`, { type: blob.type || 'image/jpeg' });
               files.push(file);
             } catch (e) {
               console.error('Error fetching image for share:', e);
@@ -116,10 +129,10 @@ export default function PicturesTab({ user, handleLogin }) {
         console.error('Error sharing:', error);
       }
     };
+
     const handleDownload = async (item) => {
       try {
-        const response = await fetch(item.url);
-        const blob = await response.blob();
+        const blob = await fetchImageBlob(item.url);
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.style.display = 'none';
@@ -131,7 +144,13 @@ export default function PicturesTab({ user, handleLogin }) {
         document.body.removeChild(a);
       } catch (error) {
         console.error('Error downloading, falling back to open in new tab:', error);
-        window.open(item.url, '_blank');
+        const a = document.createElement('a');
+        a.href = item.url;
+        a.download = `image_${item.id}.${item.type === 'image' ? 'jpg' : 'mp4'}`;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       }
     };
 
