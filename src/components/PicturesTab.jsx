@@ -183,15 +183,6 @@ export default function PicturesTab({ user, handleLogin }) {
               <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
             </button>
             {likeCount > 0 && <span className="text-white text-xs font-medium">{likeCount}</span>}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDownload(item);
-              }}
-              className="p-1 rounded-full transition-colors text-white ml-1"
-            >
-              <Download size={16} />
-            </button>
           </div>
         )}
 
