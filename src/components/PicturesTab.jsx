@@ -1,9 +1,8 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Heart, Map as MapIcon, Grid, Share2, Maximize2, X, ChevronRight, ChevronLeft, Play, Download } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Heart, Map as MapIcon, Grid, Share2, Maximize2, X, ChevronRight, ChevronLeft, Play, Download, MapPin } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -15,20 +14,32 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-export default function PicturesTab({ user, handleLogin }) {
-  const [view, setView] = useState('daily'); // 'daily' or 'gallery'
-    const [media, setMedia] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedDay, setSelectedDay] = useState(1);
-    const [lightboxItem, setLightboxItem] = useState(null);
-    const [selectedItems, setSelectedItems] = useState([]);
-    const [isSelectionMode, setIsSelectionMode] = useState(false);
-    const [notification, setNotification] = useState(null);
+// Component to auto-fit map bounds
+function MapBounds({ markers }) {
+  const map = useMap();
+  useEffect(() => {
+    if (markers && markers.length > 0) {
+      const bounds = L.latLngBounds(markers.map(m => [m.location.lat, m.location.lng]));
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    }
+  }, [markers, map]);
+  return null;
+}
 
-    const showNotification = (message, type = 'info') => {
-      setNotification({ message, type });
-      setTimeout(() => setNotification(null), 3000);
-    };
+export default function PicturesTab({ user, handleLogin }) {
+  const [media, setMedia] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [notification, setNotification] = useState(null);
+
+  const categories = ['All', 'Food', 'Culture', 'Nature', 'Attractions'];
+
+  const showNotification = (message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   useEffect(() => {
     const q = query(collection(db, 'media'), orderBy('uploadedAt', 'desc'));
@@ -68,141 +79,172 @@ export default function PicturesTab({ user, handleLogin }) {
     }
   };
 
-  const toggleSelection = (item) => {
-    if (selectedItems.includes(item.id)) {
-      setSelectedItems(prev => prev.filter(id => id !== item.id));
-      if (selectedItems.length === 1) setIsSelectionMode(false);
-    } else {
-      setSelectedItems(prev => [...prev, item.id]);
+  const fetchImageBlob = async (url) => {
+    try {
+      const response = await fetch(url, { mode: 'cors' });
+      if (!response.ok) throw new Error('Network response was not ok');
+      return await response.blob();
+    } catch (e) {
+      try {
+        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error('Proxy fetch failed');
+        return await response.blob();
+      } catch (e2) {
+        const proxyUrl2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        const response = await fetch(proxyUrl2);
+        if (!response.ok) throw new Error('Second proxy fetch failed');
+        return await response.blob();
+      }
     }
   };
 
-  const handleLongPress = (item) => {
-    setIsSelectionMode(true);
-    toggleSelection(item);
-  };
+  const handleShare = async (itemsToShare) => {
+    if (!navigator.share) {
+      showNotification('שיתוף לא נתמך בדפדפן זה', 'error');
+      return;
+    }
 
-    const fetchImageBlob = async (url) => {
-      try {
-        // Try fetching directly first
-        const response = await fetch(url, { mode: 'cors' });
-        if (!response.ok) throw new Error('Network response was not ok');
-        return await response.blob();
-      } catch (e) {
-        console.log('Direct fetch failed, trying proxy...', e);
-        try {
-            // Try with a proxy that adds CORS headers
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-            const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error('Proxy fetch failed');
-            return await response.blob();
-        } catch (e2) {
-            console.log('First proxy failed, trying second proxy...', e2);
-            // Try another proxy
-            const proxyUrl2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-            const response = await fetch(proxyUrl2);
-            if (!response.ok) throw new Error('Second proxy fetch failed');
-            return await response.blob();
-        }
-      }
-    };
-
-    const handleShare = async (itemsToShare) => {
-      if (!navigator.share) {
-        showNotification('שיתוף לא נתמך בדפדפן זה', 'error');
-        return;
-      }
-
-      showNotification('מכין תמונות לשיתוף...', 'info');
-      try {
-        const files = [];
-        let fetchFailed = false;
-        for (const item of itemsToShare) {
-          if (item.type === 'image') {
-            try {
-              const blob = await fetchImageBlob(item.url);
-              const file = new File([blob], `image_${item.id}.jpg`, { type: blob.type || 'image/jpeg' });
-              files.push(file);
-            } catch (e) {
-              console.error('Error fetching image for share:', e);
-              fetchFailed = true;
-            }
+    showNotification('מכין תמונות לשיתוף...', 'info');
+    try {
+      const files = [];
+      let fetchFailed = false;
+      for (const item of itemsToShare) {
+        if (item.type === 'image') {
+          try {
+            const blob = await fetchImageBlob(item.url);
+            const file = new File([blob], `image_${item.id}.jpg`, { type: blob.type || 'image/jpeg' });
+            files.push(file);
+          } catch (e) {
+            console.error('Error fetching image for share:', e);
+            fetchFailed = true;
           }
         }
-
-        if (!fetchFailed && files.length > 0 && navigator.canShare && navigator.canShare({ files })) {
-          await navigator.share({
-            title: 'תמונות מיפן',
-            text: 'תראו את התמונות האלה מיפן!',
-            files: files
-          });
-          showNotification('שותף בהצלחה!', 'success');
-        } else {
-          const urls = itemsToShare.map(item => item.url).join('\n');
-          await navigator.share({
-            title: 'תמונות מיפן',
-            text: 'תראו את התמונות האלה מיפן!\n' + urls
-          });
-          showNotification('שותף בהצלחה (קישורים)!', 'success');
-        }
-      } catch (error) {
-        console.error('Error sharing:', error);
-        if (error.name !== 'AbortError') {
-            showNotification('שגיאה בשיתוף', 'error');
-        }
       }
-    };
 
-    const handleDownload = async (item) => {
-      showNotification('מוריד תמונה...', 'info');
-      try {
-        const blob = await fetchImageBlob(item.url);
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = `image_${item.id}.${item.type === 'image' ? 'jpg' : 'mp4'}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        showNotification('הורד בהצלחה!', 'success');
-      } catch (error) {
-        console.error('Error downloading, falling back to open in new tab:', error);
-        showNotification('פותח תמונה בכרטיסייה חדשה...', 'info');
-        const a = document.createElement('a');
-        a.href = item.url;
-        a.download = `image_${item.id}.${item.type === 'image' ? 'jpg' : 'mp4'}`;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+      if (!fetchFailed && files.length > 0 && navigator.canShare && navigator.canShare({ files })) {
+        await navigator.share({
+          title: 'תמונות מיפן',
+          text: 'תראו את התמונות האלה מיפן!',
+          files: files
+        });
+        showNotification('שותף בהצלחה!', 'success');
+      } else {
+        const urls = itemsToShare.map(item => item.url).join('\n');
+        await navigator.share({
+          title: 'תמונות מיפן',
+          text: 'תראו את התמונות האלה מיפן!\n' + urls
+        });
+        showNotification('שותף בהצלחה (קישורים)!', 'success');
       }
-    };
+    } catch (error) {
+      console.error('Error sharing:', error);
+      if (error.name !== 'AbortError') {
+        showNotification('שגיאה בשיתוף', 'error');
+      }
+    }
+  };
 
-  const renderMediaItem = (item, isGallery = false) => {
-    const isSelected = selectedItems.includes(item.id);
+  const handleDownload = async (item) => {
+    showNotification('מוריד תמונה...', 'info');
+    try {
+      const blob = await fetchImageBlob(item.url);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `image_${item.id}.${item.type === 'image' ? 'jpg' : 'mp4'}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      showNotification('הורד בהצלחה!', 'success');
+    } catch (error) {
+      console.error('Error downloading, falling back to open in new tab:', error);
+      showNotification('פותח תמונה בכרטיסייה חדשה...', 'info');
+      const a = document.createElement('a');
+      a.href = item.url;
+      a.download = `image_${item.id}.${item.type === 'image' ? 'jpg' : 'mp4'}`;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
+  // Derived state
+  const availableDays = [...new Set(media.map(m => m.day).filter(Boolean))].sort((a, b) => a - b);
+  const displayDays = availableDays.length > 0 ? availableDays : [1];
+
+  // Ensure selectedDay is valid
+  useEffect(() => {
+    if (availableDays.length > 0 && !availableDays.includes(selectedDay)) {
+      setSelectedDay(availableDays[0]);
+    }
+  }, [availableDays, selectedDay]);
+
+  const dailyMedia = media.filter(m => m.day === selectedDay);
+
+  // Best photos: top 4 by likes
+  const bestPhotos = [...dailyMedia].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)).slice(0, 4);
+
+  // Map markers
+  const mediaWithLocation = dailyMedia.filter(m => m.location && m.location.lat && m.location.lng);
+  const mapCenter = mediaWithLocation.length > 0
+    ? [mediaWithLocation[0].location.lat, mediaWithLocation[0].location.lng]
+    : [35.6762, 139.6503]; // Default to Tokyo
+
+  // Gallery filtering
+  // Since we don't have real categories in the data yet, we'll just mock it or show all
+  const galleryMedia = activeCategory === 'All' 
+    ? dailyMedia 
+    : dailyMedia.filter(m => m.category === activeCategory || (activeCategory === 'Nature' && m.type === 'image')); // Mock filter
+
+  // Lightbox navigation
+  const lightboxItem = lightboxIndex !== null ? galleryMedia[lightboxIndex] : null;
+
+  const handlePrevLightbox = (e) => {
+    e.stopPropagation();
+    setLightboxIndex(prev => (prev > 0 ? prev - 1 : galleryMedia.length - 1));
+  };
+
+  const handleNextLightbox = (e) => {
+    e.stopPropagation();
+    setLightboxIndex(prev => (prev < galleryMedia.length - 1 ? prev + 1 : 0));
+  };
+
+  const handleShowOnMap = (item) => {
+    setLightboxIndex(null);
+    const mapElement = document.getElementById('photo-map');
+    if (mapElement) {
+      mapElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (lightboxIndex === null) return;
+      if (e.key === 'Escape') setLightboxIndex(null);
+      if (e.key === 'ArrowLeft') handleNextLightbox(e); // RTL
+      if (e.key === 'ArrowRight') handlePrevLightbox(e); // RTL
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIndex, galleryMedia.length]);
+
+  const renderMediaItem = (item, index, isFeatured = false) => {
     const hasLiked = user && item.likes?.includes(user.uid);
     const likeCount = item.likes?.length || 0;
 
     return (
-      <div 
-        key={item.id} 
-        className={`relative rounded-2xl overflow-hidden bg-gray-100 ${isGallery ? 'aspect-square' : 'mb-4'}`}
-        onClick={() => {
-          if (isSelectionMode) {
-            toggleSelection(item);
-          } else {
-            setLightboxItem(item);
-          }
-        }}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          handleLongPress(item);
-        }}
+      <div
+        key={item.id}
+        className={`relative rounded-2xl overflow-hidden bg-gray-100 cursor-pointer group ${isFeatured ? 'aspect-[4/3]' : 'aspect-square'}`}
+        onClick={() => setLightboxIndex(index)}
       >
         {item.type === 'image' ? (
-          <img src={item.url} alt="Trip media" className="w-full h-full object-cover" loading="lazy" />
+          <img src={item.url} alt="Trip media" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
         ) : (
           <div className="relative w-full h-full">
             <video src={item.url} className="w-full h-full object-cover" />
@@ -212,282 +254,293 @@ export default function PicturesTab({ user, handleLogin }) {
           </div>
         )}
 
-        {/* Overlay for selection */}
-        {isSelectionMode && (
-          <div className={`absolute inset-0 border-4 ${isSelected ? 'border-blue-500 bg-blue-500/20' : 'border-transparent bg-black/10'}`}>
-            <div className={`absolute top-2 right-2 w-6 h-6 rounded-full border-2 flex items-center justify-center ${isSelected ? 'bg-blue-500 border-blue-500' : 'border-white'}`}>
-              {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
-            </div>
-          </div>
-        )}
-
-        {/* Like button (only in daily view or if not in selection mode) */}
-        {!isSelectionMode && (
-          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1">
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                handleLike(item);
-              }}
-              className={`p-1 rounded-full transition-colors ${hasLiked ? 'text-red-500' : 'text-white'}`}
-            >
-              <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
-            </button>
-            {likeCount > 0 && <span className="text-white text-xs font-medium">{likeCount}</span>}
-          </div>
-        )}
+        {/* Like button */}
+        <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 z-10">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLike(item);
+            }}
+            className={`p-1 rounded-full transition-colors ${hasLiked ? 'text-red-500' : 'text-white'}`}
+          >
+            <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
+          </button>
+          {likeCount > 0 && <span className="text-white text-xs font-medium">{likeCount}</span>}
+        </div>
 
         {/* Uploader info */}
-        {!isGallery && !isSelectionMode && (
-          <div className="absolute top-2 right-2 flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1">
-            {item.uploaderPhoto && (
-              <img src={item.uploaderPhoto} alt={item.uploaderName} className="w-5 h-5 rounded-full" />
-            )}
-            <span className="text-white text-xs">{item.uploaderName}</span>
-          </div>
-        )}
+        <div className="absolute top-2 right-2 flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 z-10">
+          {item.uploaderPhoto && (
+            <img src={item.uploaderPhoto} alt={item.uploaderName} className="w-5 h-5 rounded-full" />
+          )}
+          <span className="text-white text-xs">{item.uploaderName}</span>
+        </div>
       </div>
     );
   };
 
-  const renderDailyView = () => {
-    // Filter media for the selected day (for now, just mock it or use all if day is not set)
-    // In a real app, we'd filter by item.day === selectedDay or by date range
-    const dailyMedia = media.filter(m => m.day === selectedDay); // Filter by selected day
-    
-    // Sort by likes for "Top Images"
-    const topMedia = [...dailyMedia].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
-
-    const mediaWithLocation = dailyMedia.filter(m => m.location);
-    const mapCenter = mediaWithLocation.length > 0 
-      ? [mediaWithLocation[0].location.lat, mediaWithLocation[0].location.lng]
-      : [35.6762, 139.6503]; // Default to Tokyo
-
+  if (loading) {
     return (
-      <div className="space-y-6">
-        {/* Day Navigation */}
-        <div className="flex items-center justify-between bg-white rounded-2xl p-2 shadow-sm border border-gray-50">
-          <button 
-            onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))}
-            className="p-2 text-gray-500 hover:bg-gray-50 rounded-xl"
-          >
-            <ChevronRight size={20} />
-          </button>
-          <span className="font-medium text-gray-700">יום {selectedDay}</span>
-          <button 
-            onClick={() => setSelectedDay(selectedDay + 1)}
-            className="p-2 text-gray-500 hover:bg-gray-50 rounded-xl"
-          >
-            <ChevronLeft size={20} />
-          </button>
+      <div className="flex justify-center py-20">
+        <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pb-24 space-y-8">
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[200] px-4 py-2 rounded-full shadow-lg text-sm font-medium transition-all duration-300 ${
+          notification.type === 'error' ? 'bg-red-500 text-white' :
+          notification.type === 'success' ? 'bg-green-500 text-white' :
+          'bg-blue-500 text-white'
+        }`}>
+          {notification.message}
         </div>
+      )}
 
+      {/* A. Days Navigation Bar */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-50 p-2 overflow-x-auto hide-scrollbar">
+        <div className="flex gap-2 min-w-max px-2">
+          {displayDays.map(day => (
+            <button
+              key={day}
+              onClick={() => setSelectedDay(day)}
+              className={`px-6 py-2.5 rounded-xl font-medium transition-all whitespace-nowrap ${
+                selectedDay === day 
+                  ? 'bg-blue-500 text-white shadow-md' 
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              יום {day}
+            </button>
+          ))}
+        </div>
+      </div>
 
-          {/* Top Images */}
-          <div>
-            <div className="flex items-center justify-between mb-4 px-2">
-              <h3 className="font-medium text-gray-700 flex items-center gap-2">
-                <Heart size={18} className="text-red-500" />
-                התמונות המובילות
-              </h3>
-              {user && (
-                <button
-                  onClick={() => handleShare(topMedia.slice(0, 4))}
-                  className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium"
-                >
-                  שתף סיכום יומי
-                </button>
-              )}
-            </div>
-
-            {topMedia.length > 0 ? (
-              <div className="grid grid-cols-2 gap-2">
-                {topMedia.slice(0, 4).map(item => renderMediaItem(item, true))}
-              </div>
-            ) : (
-              <div className="text-center py-10 bg-white rounded-3xl border border-gray-50">
-                <p className="text-gray-500">אין תמונות ליום זה עדיין</p>
-              </div>
-            )}
-          </div>
-
-          {/* Map View */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden mt-6">
-            <div className="p-4 border-b border-gray-50 flex items-center gap-2">
-              <MapIcon size={18} className="text-blue-500" />
-              <h3 className="font-medium text-gray-700">מפת תמונות</h3>
-            </div>
-            <div className="h-48 w-full z-0 relative">
-              <MapContainer
-                center={mapCenter}
-                zoom={mediaWithLocation.length > 0 ? 13 : 5}
-                style={{ height: '100%', width: '100%' }}
-                zoomControl={false}
+      {/* B. Top Highlights (Best Photos) */}
+      {bestPhotos.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-4 px-2">
+            <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
+              <Heart size={20} className="text-red-500" fill="currentColor" />
+              התמונות המובילות
+            </h3>
+            {user && (
+              <button
+                onClick={() => handleShare(bestPhotos)}
+                className="text-sm bg-blue-50 text-blue-600 px-4 py-2 rounded-full font-medium hover:bg-blue-100 transition-colors"
               >
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  {mediaWithLocation.map(item => (
-                    <Marker key={item.id} position={[item.location.lat, item.location.lng]}>
-                      <Popup>
-                        <div className="w-24 h-24">
-                          {item.type === 'image' ? (
-                            <img src={item.url} className="w-full h-full object-cover rounded-lg" />
-                          ) : (
-                            <video src={item.url} className="w-full h-full object-cover rounded-lg" />
-                          )}
-                        </div>
-                      </Popup>
-                    </Marker>
-                  ))}
-                </MapContainer>
-            </div>
-          </div>
-      </div>
-    );
-  };
-
-  const renderGalleryView = () => {
-    return (
-      <div>
-        {isSelectionMode && (
-          <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-gray-100 mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button onClick={() => {
-                setIsSelectionMode(false);
-                setSelectedItems([]);
-              }} className="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
-                <X size={20} />
+                שתף סיכום יומי
               </button>
-              <span className="font-medium text-gray-700">{selectedItems.length} נבחרו</span>
-            </div>
-            <button 
-              onClick={() => handleShare(media.filter(m => selectedItems.includes(m.id)))}
-              disabled={selectedItems.length === 0}
-              className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-xl disabled:opacity-50"
+            )}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {bestPhotos.map((item) => {
+              // Find index in galleryMedia for lightbox
+              const index = galleryMedia.findIndex(m => m.id === item.id);
+              return renderMediaItem(item, index !== -1 ? index : 0, true);
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* C. Interactive Map Component */}
+      <section id="photo-map" className="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden">
+        <div className="p-4 border-b border-gray-50 flex items-center gap-2">
+          <MapIcon size={20} className="text-blue-500" />
+          <h3 className="font-bold text-lg text-gray-800">מפת תמונות</h3>
+        </div>
+        <div className="h-64 sm:h-96 w-full z-0 relative">
+          <MapContainer
+            center={mapCenter}
+            zoom={mediaWithLocation.length > 0 ? 13 : 5}
+            style={{ height: '100%', width: '100%' }}
+            zoomControl={true}
+          >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <MapBounds markers={mediaWithLocation} />
+            {mediaWithLocation.map(item => {
+              const index = galleryMedia.findIndex(m => m.id === item.id);
+              return (
+                <Marker key={item.id} position={[item.location.lat, item.location.lng]}>
+                  <Popup>
+                    <div className="w-32 flex flex-col gap-2">
+                      <div className="w-full aspect-square rounded-lg overflow-hidden cursor-pointer" onClick={() => setLightboxIndex(index !== -1 ? index : 0)}>
+                        {item.type === 'image' ? (
+                          <img src={item.url} className="w-full h-full object-cover" />
+                        ) : (
+                          <video src={item.url} className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                      <button 
+                        onClick={() => setLightboxIndex(index !== -1 ? index : 0)}
+                        className="w-full bg-blue-500 text-white text-xs py-1.5 rounded-md font-medium"
+                      >
+                        הגדל תמונה
+                      </button>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
+          </MapContainer>
+        </div>
+      </section>
+
+      {/* D. Full Gallery & Category Filtering */}
+      <section>
+        <div className="flex items-center justify-between mb-4 px-2">
+          <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
+            <Grid size={20} className="text-blue-500" />
+            גלריה מלאה
+          </h3>
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar mb-4 px-2 pb-2">
+          {categories.map(category => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                activeCategory === category
+                  ? 'bg-gray-800 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
             >
-              <Share2 size={18} />
-              <span>שתף</span>
+              {category === 'All' ? 'הכל' : 
+               category === 'Food' ? 'אוכל' : 
+               category === 'Culture' ? 'תרבות' : 
+               category === 'Nature' ? 'טבע' : 'אטרקציות'}
             </button>
+          ))}
+        </div>
+
+        {galleryMedia.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
+            {galleryMedia.map((item, index) => renderMediaItem(item, index))}
+          </div>
+        ) : (
+          <div className="text-center py-12 bg-white rounded-3xl border border-gray-50">
+            <p className="text-gray-500">אין תמונות בקטגוריה זו</p>
           </div>
         )}
+      </section>
 
-        <div className="grid grid-cols-3 gap-1">
-          {media.map(item => renderMediaItem(item, true))}
-        </div>
-      </div>
-    );
-  };
-
-      return (
-        <div className="pb-24">
-          {/* Notification Toast */}
-          {notification && (
-            <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[200] px-4 py-2 rounded-full shadow-lg text-sm font-medium transition-all duration-300 ${
-              notification.type === 'error' ? 'bg-red-500 text-white' :
-              notification.type === 'success' ? 'bg-green-500 text-white' :
-              'bg-blue-500 text-white'
-            }`}>
-              {notification.message}
-            </div>
-          )}
-
-          {/* Header */}
-          <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
-            <button
-              onClick={() => setView('daily')}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-                view === 'daily' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'
-              }`}
-            >
-              סיכום יומי
-            </button>
-            <button
-              onClick={() => setView('gallery')}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-                view === 'gallery' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'
-              }`}
-            >
-              גלריה מלאה
-            </button>
-          </div>
-
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-            </div>
-          ) : (
-            view === 'daily' ? renderDailyView() : renderGalleryView()
-          )}
-
-          {/* Lightbox */}
-      {/* Lightbox */}
+      {/* E. Lightbox / Modal Overlay */}
       {lightboxItem && (
-        <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-in fade-in duration-200">
-          <div className="flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent absolute top-0 w-full z-10">
-            <button 
-              onClick={() => setLightboxItem(null)}
-              className="p-2 text-white/80 hover:text-white bg-black/20 rounded-full backdrop-blur-sm"
+        <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col animate-in fade-in duration-200">
+          {/* Top Bar */}
+          <div className="flex items-center justify-between p-4 absolute top-0 w-full z-10">
+            <button
+              onClick={() => setLightboxIndex(null)}
+              className="p-2 text-white/80 hover:text-white bg-white/10 rounded-full backdrop-blur-sm transition-colors"
             >
               <X size={24} />
             </button>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              {lightboxItem.location && (
                 <button
-                  onClick={() => handleDownload(lightboxItem)}
-                  className="p-2 text-white/80 hover:text-white bg-black/20 rounded-full backdrop-blur-sm"
+                  onClick={() => handleShowOnMap(lightboxItem)}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/80 hover:bg-blue-500 text-white rounded-full backdrop-blur-sm transition-colors text-sm font-medium"
                 >
-                  <Download size={20} />
+                  <MapPin size={16} />
+                  הצג במפה
                 </button>
-
-              <button 
+              )}
+              <button
+                onClick={() => handleDownload(lightboxItem)}
+                className="p-2 text-white/80 hover:text-white bg-white/10 rounded-full backdrop-blur-sm transition-colors"
+              >
+                <Download size={20} />
+              </button>
+              <button
                 onClick={() => handleShare([lightboxItem])}
-                className="p-2 text-white/80 hover:text-white bg-black/20 rounded-full backdrop-blur-sm"
+                className="p-2 text-white/80 hover:text-white bg-white/10 rounded-full backdrop-blur-sm transition-colors"
               >
                 <Share2 size={20} />
               </button>
             </div>
           </div>
-          
-          <div className="flex-1 flex items-center justify-center p-4">
-            {lightboxItem.type === 'image' ? (
-              <img 
-                src={lightboxItem.url} 
-                alt="Full size" 
-                className="max-w-full max-h-full object-contain"
-              />
-            ) : (
-              <video 
-                src={lightboxItem.url} 
-                controls 
-                autoPlay 
-                className="max-w-full max-h-full object-contain"
-              />
+
+          {/* Main Content */}
+          <div className="flex-1 flex items-center justify-center relative">
+            {/* Prev/Next Buttons */}
+            {galleryMedia.length > 1 && (
+              <>
+                <button 
+                  onClick={handleNextLightbox}
+                  className="absolute left-4 p-3 text-white/50 hover:text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-sm transition-all z-10"
+                >
+                  <ChevronLeft size={32} />
+                </button>
+                <button 
+                  onClick={handlePrevLightbox}
+                  className="absolute right-4 p-3 text-white/50 hover:text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-sm transition-all z-10"
+                >
+                  <ChevronRight size={32} />
+                </button>
+              </>
             )}
+
+            <div className="w-full h-full p-4 md:p-12 flex items-center justify-center">
+              {lightboxItem.type === 'image' ? (
+                <img
+                  src={lightboxItem.url}
+                  alt="Full size"
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
+              ) : (
+                <video
+                  src={lightboxItem.url}
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
+              )}
+            </div>
           </div>
 
-          <div className="p-6 bg-gradient-to-t from-black/80 to-transparent absolute bottom-0 w-full">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {lightboxItem.uploaderPhoto && (
-                  <img src={lightboxItem.uploaderPhoto} alt={lightboxItem.uploaderName} className="w-8 h-8 rounded-full border border-white/20" />
-                )}
-                <div className="text-white">
-                  <p className="text-sm font-medium">{lightboxItem.uploaderName}</p>
-                  {lightboxItem.originalDate && (
-                    <p className="text-xs text-white/60">
-                      {new Date(lightboxItem.originalDate).toLocaleDateString('he-IL')}
-                    </p>
+          {/* Bottom Bar / Metadata */}
+          <div className="p-6 bg-gradient-to-t from-black/90 via-black/60 to-transparent absolute bottom-0 w-full">
+            <div className="flex items-end justify-between max-w-4xl mx-auto">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  {lightboxItem.uploaderPhoto && (
+                    <img src={lightboxItem.uploaderPhoto} alt={lightboxItem.uploaderName} className="w-10 h-10 rounded-full border-2 border-white/20" />
                   )}
+                  <div className="text-white">
+                    <p className="font-medium text-lg">{lightboxItem.uploaderName}</p>
+                    <div className="flex items-center gap-2 text-sm text-white/70">
+                      {lightboxItem.originalDate && (
+                        <span>{new Date(lightboxItem.originalDate).toLocaleDateString('he-IL')}</span>
+                      )}
+                      {lightboxItem.location && (
+                        <>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <MapPin size={12} />
+                            מיקום מצורף
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <button 
+
+              <button
                 onClick={() => handleLike(lightboxItem)}
-                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full transition-colors"
+                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-5 py-2.5 rounded-full transition-colors"
               >
-                <Heart 
-                  size={20} 
-                  className={user && lightboxItem.likes?.includes(user.uid) ? 'text-red-500' : 'text-white'} 
-                  fill={user && lightboxItem.likes?.includes(user.uid) ? "currentColor" : "none"} 
+                <Heart
+                  size={24}
+                  className={user && lightboxItem.likes?.includes(user.uid) ? 'text-red-500' : 'text-white'}
+                  fill={user && lightboxItem.likes?.includes(user.uid) ? "currentColor" : "none"}
                 />
-                <span className="text-white font-medium">{lightboxItem.likes?.length || 0}</span>
+                <span className="text-white font-medium text-lg">{lightboxItem.likes?.length || 0}</span>
               </button>
             </div>
           </div>
