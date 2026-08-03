@@ -173,7 +173,9 @@ export default function PicturesTab({ user, handleLogin }) {
   };
 
   // Derived state
-  const availableDays = [...new Set(media.map(m => m.day).filter(Boolean))].sort((a, b) => a - b);
+  // If a media item doesn't have a day, we'll assign it to day 1 for display purposes
+  const mediaWithDays = media.map(m => ({ ...m, day: m.day || 1 }));
+  const availableDays = [...new Set(mediaWithDays.map(m => m.day))].sort((a, b) => a - b);
   const displayDays = availableDays.length > 0 ? availableDays : [1];
 
   // Ensure selectedDay is valid
@@ -183,7 +185,7 @@ export default function PicturesTab({ user, handleLogin }) {
     }
   }, [availableDays, selectedDay]);
 
-  const dailyMedia = media.filter(m => m.day === selectedDay);
+  const dailyMedia = mediaWithDays.filter(m => m.day === selectedDay);
 
   // Best photos: top 4 by likes
   const bestPhotos = [...dailyMedia].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)).slice(0, 4);
