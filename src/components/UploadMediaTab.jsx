@@ -5,6 +5,8 @@ import { ref, uploadBytes, uploadBytesResumable, getDownloadURL } from 'firebase
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { storage, db } from '../firebase';
 import exifr from 'exifr';
+import { ITINERARY } from '../itinerary-data';
+
 
 export default function UploadMediaTab({ user }) {
   const [files, setFiles] = useState([]);
@@ -28,7 +30,8 @@ export default function UploadMediaTab({ user }) {
       let metadata = {
         date: null,
         latitude: null,
-        longitude: null
+        longitude: null,
+        day: null
       };
 
       if (file.type.startsWith('image/')) {
@@ -36,7 +39,16 @@ export default function UploadMediaTab({ user }) {
           const exifData = await exifr.parse(file);
           if (exifData) {
             if (exifData.DateTimeOriginal) {
-              metadata.date = new Date(exifData.DateTimeOriginal).toISOString();
+              const dateObj = new Date(exifData.DateTimeOriginal);
+              metadata.date = dateObj.toISOString();
+
+              const day = dateObj.getDate();
+              const month = dateObj.getMonth() + 1;
+              const dateStr = `${day}.${month}`;
+              const itineraryDay = ITINERARY.find(item => item.date === dateStr);
+              if (itineraryDay) {
+                metadata.day = itineraryDay.day;
+              }
             }
             if (exifData.latitude && exifData.longitude) {
               metadata.latitude = exifData.latitude;
@@ -120,7 +132,7 @@ export default function UploadMediaTab({ user }) {
           } : null,
           likes: [],
           isTopImage: false,
-          day: null // Can be assigned later based on date or manually
+          day: item.metadata.day || null
         });
         addLog(`Successfully saved metadata for ${file.name}.`);
       }

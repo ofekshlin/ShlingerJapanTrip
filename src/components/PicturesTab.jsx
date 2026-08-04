@@ -31,11 +31,9 @@ export default function PicturesTab({ user, handleLogin }) {
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(1);
   const [lightboxIndex, setLightboxIndex] = useState(null);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [notification, setNotification] = useState(null);
+    const [notification, setNotification] = useState(null);
 
-  const categories = ['All', 'Food', 'Culture', 'Nature', 'Attractions'];
-
+  
   const showNotification = (message, type = 'info') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
@@ -174,7 +172,7 @@ export default function PicturesTab({ user, handleLogin }) {
 
   // Derived state
   // If a media item doesn't have a day, we'll assign it to day 1 for display purposes
-  const mediaWithDays = media.map(m => ({ ...m, day: m.day || 1 }));
+  const mediaWithDays = media.map(m => ({ ...m, day: m.day ? Number(m.day) : 1 }));
   const availableDays = [...new Set(mediaWithDays.map(m => m.day))].sort((a, b) => a - b);
   const displayDays = availableDays.length > 0 ? availableDays : [1];
 
@@ -198,9 +196,7 @@ export default function PicturesTab({ user, handleLogin }) {
 
   // Gallery filtering
   // Since we don't have real categories in the data yet, we'll just mock it or show all
-  const galleryMedia = activeCategory === 'All' 
-    ? dailyMedia 
-    : dailyMedia.filter(m => m.category === activeCategory || (activeCategory === 'Nature' && m.type === 'image')); // Mock filter
+  const galleryMedia = dailyMedia;
 
   // Lightbox navigation
   const lightboxItem = lightboxIndex !== null ? galleryMedia[lightboxIndex] : null;
@@ -400,25 +396,7 @@ export default function PicturesTab({ user, handleLogin }) {
           </h3>
         </div>
 
-        {/* Category Pills */}
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar mb-4 px-2 pb-2">
-          {categories.map(category => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                activeCategory === category
-                  ? 'bg-gray-800 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {category === 'All' ? 'הכל' : 
-               category === 'Food' ? 'אוכל' : 
-               category === 'Culture' ? 'תרבות' : 
-               category === 'Nature' ? 'טבע' : 'אטרקציות'}
-            </button>
-          ))}
-        </div>
+        
 
         {galleryMedia.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
@@ -426,7 +404,7 @@ export default function PicturesTab({ user, handleLogin }) {
           </div>
         ) : (
           <div className="text-center py-12 bg-white rounded-3xl border border-gray-50">
-            <p className="text-gray-500">אין תמונות בקטגוריה זו</p>
+            <p className="text-gray-500">אין תמונות ליום זה</p>
           </div>
         )}
       </section>
